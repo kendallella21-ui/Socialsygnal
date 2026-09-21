@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SYGNAL — Simple signals. Real connections.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ECE9E5; --bg-2:#F4F2EF; --panel:rgba(250,249,247,.78); --panel-solid:#FAF9F7; --photo:#E3E0DC;
+  --ink:#141317; --ink-2:#55525C; --ink-3:#8D8993; --line:rgba(20,19,23,.09); --line-2:rgba(20,19,23,.16);
+  --grid:rgba(20,19,23,.045); --shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 24px 60px -24px rgba(40,30,20,.22);
+  --open:#2FDC73; --social:#4F8DFF; --focus:#FF4B5C;
+  --active:var(--open);
+  --sans:"Geist","SF Pro Display","Helvetica Neue",Arial,sans-serif;
+  --hand:"Caveat","Bradley Hand","Segoe Print",cursive;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A090C; --bg-2:#111015; --panel:rgba(24,22,29,.66); --panel-solid:#141218; --photo:#1A181E;
+    --ink:#F3F1EE; --ink-2:#ACA8B3; --ink-3:#6F6B76; --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.14);
+    --grid:rgba(255,255,255,.03); --shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 30px 80px -30px rgba(0,0,0,.85);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A090C; --bg-2:#111015; --panel:rgba(24,22,29,.66); --panel-solid:#141218; --photo:#1A181E;
+  --ink:#F3F1EE; --ink-2:#ACA8B3; --ink-3:#6F6B76; --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.14);
+  --grid:rgba(255,255,255,.03); --shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 30px 80px -30px rgba(0,0,0,.85);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--active);outline-offset:3px;border-radius:8px}
+.wrap{width:min(1200px,100% - 40px);margin-inline:auto}
+.hand{font-family:var(--hand);font-weight:500;color:var(--ink-2);line-height:1.05}
+
+.ambient{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(760px 420px at 78% 60px, color-mix(in srgb,var(--active) 22%,transparent), transparent 70%),
+    linear-gradient(var(--grid) 1px,transparent 1px) 0 0/64px 64px,
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/64px 64px;
+  mask-image:linear-gradient(#000 0,#000 700px,transparent 1100px);-webkit-mask-image:linear-gradient(#000 0,#000 700px,transparent 1100px);
+  transition:background 1s}
+
+/* Wordmark */
+.wm{display:inline-flex;align-items:baseline;font-weight:400;letter-spacing:.3em;font-size:15px;line-height:1}
+.wm .ur{font-weight:300;letter-spacing:.02em;margin-right:.08em;color:color-mix(in srgb,currentColor 60%,transparent)}
+
+/* Nav */
+.navbar{position:sticky;top:0;z-index:30;backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);background:color-mix(in srgb,var(--bg) 72%,transparent);border-bottom:1px solid var(--line)}
+nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+.links{display:flex;gap:30px;list-style:none;font-size:14px;color:var(--ink-2)}
+.links a:hover{color:var(--ink)}
+.nav-cta{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 18px;border-radius:10px;font:500 14px var(--sans);border:1px solid transparent;cursor:pointer;transition:transform .15s,box-shadow .25s;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--ink);color:var(--bg);box-shadow:0 0 0 1px var(--ink),0 10px 28px -10px color-mix(in srgb,var(--active) 80%,transparent)}
+.btn-primary:hover{box-shadow:0 0 0 1px var(--ink),0 12px 36px -6px color-mix(in srgb,var(--active) 95%,transparent)}
+.btn-ghost{background:var(--panel);color:var(--ink);border-color:var(--line-2)}
+.btn-ghost:hover{border-color:var(--ink-3)}
+.btn-lg{height:48px;padding:0 24px;font-size:15px;border-radius:12px}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:80px 0 40px}
+.tagline{font-size:12px;letter-spacing:.3em;color:var(--ink-2);text-transform:uppercase}
+.hero-wm{font-size:22px;margin-bottom:12px}
+h1{font-weight:500;font-size:clamp(44px,6vw,78px);line-height:1;letter-spacing:-.05em;margin-top:30px}
+h1 .soft{color:var(--ink-3);font-weight:300}
+.sub{max-width:470px;margin-top:22px;font-size:18px;color:var(--ink-2)}
+.hero-cta{display:flex;gap:10px;margin-top:32px;flex-wrap:wrap}
+.perks{display:flex;gap:28px;margin-top:44px;flex-wrap:wrap}
+.perk{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--ink-2);line-height:1.3}
+.perk span.ic{width:42px;height:42px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;flex:none;background:var(--panel)}
+.perk svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+.stage{position:relative}
+.photo-card{position:relative;border-radius:28px;overflow:hidden;background:var(--photo);border:1px solid var(--line);box-shadow:var(--shadow);aspect-ratio:372/450}
+.photo-card img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.photo-card::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 40% at 58% 52%, color-mix(in srgb,var(--active) 26%,transparent), transparent 70%);mix-blend-mode:soft-light;transition:background 1s}
+.note{position:absolute;font-size:26px;transform:rotate(-6deg)}
+.note svg{display:block;width:70px;height:50px;stroke:var(--ink-2);fill:none;stroke-width:1.6;stroke-linecap:round}
+.note-1{top:28px;right:-26px;text-align:right}
+.inset{position:absolute;left:-44px;bottom:48px;width:170px;border-radius:20px;overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow);background:var(--photo)}
+.inset img{width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center 40%}
+.note-2{left:-40px;bottom:-10px;transform:rotate(-4deg);font-size:24px}
+.mode-chip{position:absolute;right:20px;bottom:20px;display:flex;align-items:center;gap:10px;padding:10px 14px 10px 12px;border-radius:14px;background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--line-2);box-shadow:var(--shadow);font-size:13px}
+.mode-chip i{width:10px;height:10px;border-radius:50%;background:var(--active);box-shadow:0 0 12px var(--active);transition:background .6s,box-shadow .6s}
+.mode-chip b{font-weight:600}
+.mode-chip small{color:var(--ink-3);display:block;font-size:12px}
+
+/* Product window */
+.window{margin:96px auto 0;max-width:1080px;border-radius:22px;padding:8px;background:linear-gradient(180deg,var(--line-2),transparent 60%);position:relative}
+.win{border-radius:16px;background:var(--panel-solid);border:1px solid var(--line);overflow:hidden;box-shadow:var(--shadow)}
+.win-bar{display:flex;align-items:center;gap:14px;height:46px;padding:0 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+.lights{display:flex;gap:6px}.lights i{width:10px;height:10px;border-radius:50%;background:var(--line-2)}
+.win-bar .live{margin-left:auto;display:flex;align-items:center;gap:7px;color:var(--ink-2)}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--open);box-shadow:0 0 0 3px color-mix(in srgb,var(--open) 25%,transparent)}
+.venues{display:flex;gap:4px;padding:3px;border-radius:9px;background:var(--bg-2);border:1px solid var(--line)}
+.venues button{border:0;background:transparent;color:var(--ink-3);font:500 12px var(--sans);padding:4px 10px;border-radius:6px;cursor:pointer}
+.venues button[aria-pressed="true"]{background:var(--panel-solid);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.win-body{display:grid;grid-template-columns:260px 1fr;min-height:420px}
+.side{border-right:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:14px}
+.side h4{font-size:12px;font-weight:500;color:var(--ink-3);margin-top:6px}
+.venue{font-size:15px;font-weight:500}
+.venue small{display:block;font-weight:400;color:var(--ink-3);font-size:13px}
+.stat{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;font-size:14px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg-2)}
+.stat i{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c)}
+.stat b{font-weight:600;font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:6px;background:var(--line);overflow:hidden;display:flex}
+.bar span{height:100%;transition:width .8s}
+.room{position:relative;overflow:hidden;background:
+  linear-gradient(var(--grid) 1px,transparent 1px) 0 0/28px 28px,
+  linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/28px 28px}
+.zone{position:absolute;border:1px dashed var(--line-2);border-radius:14px;font-size:11px;color:var(--ink-3);padding:6px 9px;transition:all .6s}
+.guest{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--c);transform:translate(-50%,-50%);box-shadow:0 0 12px var(--c);transition:left 2.4s cubic-bezier(.4,0,.2,1),top 2.4s cubic-bezier(.4,0,.2,1)}
+.guest.ping::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1.5px solid var(--c);animation:ping 2.4s ease-out infinite}
+@keyframes ping{from{transform:scale(.6);opacity:1}to{transform:scale(2.2);opacity:0}}
+.toast{position:absolute;right:18px;bottom:18px;display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--panel);backdrop-filter:blur(12px);border:1px solid var(--line-2);font-size:13px;box-shadow:var(--shadow)}
+.toast i{width:9px;height:9px;border-radius:50%;background:var(--open);flex:none}
+.toast span small{color:var(--ink-3);font-size:13px;display:block}
+
+/* Sections */
+section{padding:120px 0}
+.head{max-width:680px;margin:0 auto 60px;text-align:center}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2);margin-bottom:16px}
+.kicker i{width:6px;height:6px;border-radius:50%;background:var(--active);transition:background .8s}
+h2{font-weight:500;font-size:clamp(34px,4.6vw,58px);line-height:1.03;letter-spacing:-.045em}
+h2 .soft{color:var(--ink-3);font-weight:300}
+.head p{margin-top:18px;color:var(--ink-2);font-size:18px}
+
+/* Modes */
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mode{position:relative;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:22px;border:1px solid var(--line);background:var(--panel);padding:10px 10px 26px;box-shadow:var(--shadow);overflow:hidden;transition:border-color .3s,transform .3s}
+.mode:hover{transform:translateY(-2px)}
+.mode[aria-pressed="true"]{border-color:color-mix(in srgb,var(--c) 70%,transparent);box-shadow:var(--shadow),0 0 0 4px color-mix(in srgb,var(--c) 14%,transparent)}
+.mode .pic{border-radius:14px;overflow:hidden;background:var(--photo)}
+.mode img{width:100%;aspect-ratio:267/148;object-fit:cover}
+.mode .txt{padding:20px 16px 0}
+.mode-top{display:flex;align-items:center;justify-content:space-between}
+.mode h3{font-size:24px;font-weight:500;letter-spacing:-.03em}
+.dot{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-2);padding:4px 10px;border-radius:999px;border:1px solid var(--line-2)}
+.dot i{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.mode p{color:var(--ink-2);margin-top:6px}
+.mode .tells{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;display:flex;justify-content:space-between;color:var(--ink-3)}
+.mode .tells b{color:var(--ink);font-weight:500}
+.press{text-align:center;margin-top:30px;font-size:28px}
+
+/* Gallery */
+.gallery{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:16px;align-items:stretch}
+.shot{position:relative;border-radius:24px;overflow:hidden;min-height:420px;background:#111}
+.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.shot::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.72))}
+.shot .cap{position:absolute;left:22px;right:22px;bottom:20px;z-index:1;color:#fff}
+.shot .cap b{display:block;font-size:22px;font-weight:500;letter-spacing:-.03em}
+.shot .cap span{font-size:14px;opacity:.75}
+.shot .tag{position:absolute;top:18px;left:18px;z-index:1;display:flex;align-items:center;gap:7px;font-size:12px;color:#fff;padding:5px 11px;border-radius:999px;background:rgba(0,0,0,.35);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18)}
+.shot .tag i{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.scenes{display:grid;grid-template-columns:repeat(4,1fr);margin-top:40px;border-top:1px solid var(--line)}
+.scene{padding:26px 24px 0 0}
+.scene + .scene{padding-left:24px;border-left:1px solid var(--line)}
+.scene b{font-weight:500;font-size:18px;letter-spacing:-.02em}
+.scene p{font-size:14px;color:var(--ink-2);margin-top:4px}
+
+/* Colorways */
+.finish{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+.finish-photo{border-radius:24px;overflow:hidden;background:var(--photo);border:1px solid var(--line);box-shadow:var(--shadow);min-height:300px;position:relative}
+.finish-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.04)}
+.finish-panel{border-radius:24px;border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);padding:34px;display:flex;flex-direction:column}
+.finish-panel h3{font-size:30px;font-weight:500;letter-spacing:-.04em;line-height:1.1}
+.finish-panel > p{color:var(--ink-2);margin-top:10px}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:28px}
+.sw{font:inherit;color:inherit;background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;text-align:left;transition:border-color .2s}
+.sw[aria-pressed="true"]{border-color:var(--ink)}
+.sw i{display:block;height:36px;border-radius:10px;background:var(--s);box-shadow:inset 0 -6px 10px rgba(0,0,0,.12),inset 0 4px 8px rgba(255,255,255,.35),0 0 0 1px rgba(0,0,0,.06)}
+.sw b{display:block;margin-top:10px;font-size:14px;font-weight:500}
+.sw small{font-size:12px;color:var(--ink-3)}
+.finish-note{margin-top:auto;padding-top:26px;font-size:26px}
+
+/* Bento */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.tile{border-radius:20px;border:1px solid var(--line);background:var(--panel);padding:28px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+.tile h3{font-size:20px;font-weight:500;letter-spacing:-.03em}
+.tile p{color:var(--ink-2);margin-top:6px;font-size:15px;max-width:38ch}
+.t-a{grid-column:span 3}.t-b{grid-column:span 3}.t-c,.t-d,.t-e{grid-column:span 2}
+.big{font-size:64px;font-weight:500;letter-spacing:-.06em;line-height:1;margin-top:22px;font-variant-numeric:tabular-nums}
+.big small{font-size:16px;color:var(--ink-3);letter-spacing:0;font-weight:400;margin-left:6px}
+.dial{display:flex;align-items:center;gap:22px;margin-top:22px}
+.knob{width:88px;height:88px;border-radius:50%;background:conic-gradient(var(--open) 0 33%,var(--social) 0 66%,var(--focus) 0);padding:6px;flex:none;transform:rotate(var(--rot,0deg));transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.knob::after{content:"";display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#3a3840,#0e0d11);box-shadow:inset 0 2px 6px rgba(255,255,255,.1)}
+.dial ul{list-style:none;font-size:14px;display:grid;gap:4px;color:var(--ink-3)}
+.dial li.on{color:var(--ink);font-weight:500}
+.spark{margin-top:18px;height:70px;width:100%}
+.spark path{stroke:var(--active);transition:stroke .8s}
+.mini{margin-top:18px;display:grid;gap:8px;font-size:14px}
+.mini div{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg-2)}
+.mini i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.mini span{margin-left:auto;color:var(--ink-3);font-size:12px}
+
+/* Quotes */
+.quotes{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:16px}
+.quote{border-radius:20px;border:1px solid var(--line);background:var(--panel);padding:28px;display:flex;flex-direction:column;justify-content:space-between;gap:30px}
+.quote q{quotes:none;font-size:17px;line-height:1.5}
+.quote.big-q q{font-size:28px;line-height:1.2;letter-spacing:-.03em;font-weight:400}
+.who{display:flex;align-items:center;gap:12px;font-size:14px}
+.av{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 30% 30%,color-mix(in srgb,var(--c) 70%,#fff),var(--c));flex:none}
+.who small{display:block;color:var(--ink-3)}
+
+/* Pricing */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.plan{border-radius:20px;border:1px solid var(--line);background:var(--panel);padding:30px;display:flex;flex-direction:column;position:relative}
+.plan.featured{background:var(--ink);color:var(--bg);border-color:var(--ink);box-shadow:0 30px 80px -30px color-mix(in srgb,var(--active) 70%,transparent)}
+.plan.featured .muted,.plan.featured li{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.plan h3{font-size:17px;font-weight:500}
+.price{font-size:52px;font-weight:500;letter-spacing:-.05em;margin-top:18px;line-height:1}
+.price small{font-size:15px;font-weight:400;letter-spacing:0;opacity:.6}
+.muted{color:var(--ink-2);font-size:14px;margin-top:10px}
+.plan ul{list-style:none;margin:26px 0 30px;display:grid;gap:10px;font-size:14px;color:var(--ink-2)}
+.plan li{display:flex;gap:10px}
+.plan li::before{content:"";flex:none;width:16px;height:16px;margin-top:3px;border-radius:50%;background:radial-gradient(circle,var(--active) 0 3px,transparent 3.5px),color-mix(in srgb,var(--active) 20%,transparent);transition:background .8s}
+.plan .btn{margin-top:auto;width:100%}
+.plan.featured .btn-primary{background:var(--bg);color:var(--ink);box-shadow:none}
+.badge{position:absolute;top:22px;right:22px;font-size:12px;padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,var(--open),var(--social));color:#0A090C;font-weight:500}
+
+/* FAQ */
+.faq{max-width:760px;margin:0 auto}
+details{border-bottom:1px solid var(--line);padding:22px 0}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:18px;font-weight:500;letter-spacing:-.02em}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-weight:300;font-size:26px;color:var(--ink-3);transition:transform .25s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{color:var(--ink-2);margin-top:10px;max-width:62ch}
+
+/* CTA */
+.cta{position:relative;border-radius:28px;overflow:hidden;padding:96px 40px;text-align:center;background:#0B0A0E;color:#F3F1EE}
+.cta::before{content:"";position:absolute;left:50%;bottom:-360px;width:900px;height:520px;transform:translateX(-50%);border-radius:50%;background:conic-gradient(from 180deg,var(--open),var(--social),var(--focus),var(--open));filter:blur(80px);opacity:.55}
+.cta > *{position:relative}
+.cta .kicker{color:rgba(243,241,238,.7)}
+.cta .wm{font-size:13px;opacity:.7;margin-bottom:26px}
+.cta h2{max-width:15ch;margin:0 auto}
+.cta p{color:rgba(243,241,238,.7);margin:18px auto 0;max-width:460px}
+.cta .hand{color:rgba(243,241,238,.85);font-size:30px;margin-top:10px;transform:rotate(-3deg)}
+form{display:flex;gap:8px;max-width:440px;margin:34px auto 0;padding:6px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);backdrop-filter:blur(10px)}
+form:focus-within{border-color:var(--active)}
+input{flex:1;min-width:0;border:0;background:transparent;color:#F3F1EE;font:400 15px var(--sans);padding:0 12px;outline:none}
+input::placeholder{color:rgba(243,241,238,.45)}
+.cta .btn-primary{background:#F3F1EE;color:#0B0A0E;box-shadow:none}
+.msg{min-height:1.4em;margin-top:14px;font-size:14px;font-weight:500}
+
+footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding:48px 0 60px;border-top:1px solid var(--line);margin-top:100px;font-size:14px;color:var(--ink-3)}
+footer .fl{display:flex;gap:24px}
+
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr;gap:70px;padding-top:50px}
+  .stage{max-width:460px;margin:0 auto;width:100%}
+  .inset{left:-10px;width:130px}
+  .note-1{right:0;top:-54px}
+  .note-2{left:-4px}
+  .links{display:none}
+  .win-body{grid-template-columns:1fr}
+  .side{border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .side .venue,.side h4,.side .bar{grid-column:1/-1}
+  .room{min-height:340px}
+  .modes,.plans,.quotes,.gallery,.finish{grid-template-columns:1fr}
+  .shot{min-height:340px}
+  .scenes{grid-template-columns:1fr 1fr}
+  .scene,.scene + .scene{padding:20px 16px 20px 0;border-left:0;border-bottom:1px solid var(--line)}
+  .bento{grid-template-columns:1fr 1fr}
+  .t-a,.t-b{grid-column:span 2}.t-c,.t-d,.t-e{grid-column:span 1}
+  section{padding:90px 0}
+}
+@media (max-width:600px){
+  .nav-cta .btn-ghost{display:none}
+  .side{grid-template-columns:1fr}
+  .bento{grid-template-columns:1fr}.t-a,.t-b,.t-c,.t-d,.t-e{grid-column:span 1}
+  .swatches{grid-template-columns:1fr 1fr}
+  .toast{left:12px;right:12px}
+  .perks{gap:18px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+
+<div class="navbar">
+  <div class="wrap">
+    <nav>
+      <a class="wm" href="#top" aria-label="SYGNAL home">SYGNAL</a>
+      <ul class="links">
+        <li><a href="#modes">Modes</a></li>
+        <li><a href="#everywhere">Where to wear</a></li>
+        <li><a href="#finishes">Finishes</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a class="btn btn-ghost" href="#pricing">Host an event</a>
+        <a class="btn btn-primary" href="#join">Get early access</a>
+      </div>
+    </nav>
+  </div>
+</div>
+
+<main id="top">
+  <div class="wrap">
+    <header class="hero">
+      <div>
+        <div class="wm hero-wm" aria-hidden="true">SYGNAL</div>
+        <p class="tagline">Simple signals. Real connections.</p>
+        <h1>Wear your intention. <span class="soft">Skip the guesswork.</span></h1>
+        <p class="sub">SYGNAL is a minimal digital watch with a light ring that glows green, blue, or red, so everyone can see whether you want to meet someone, just be social, or be left alone.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" href="#join">Get early access</a>
+          <a class="btn btn-ghost btn-lg" href="#modes">See the modes</a>
+        </div>
+        <div class="perks">
+          <div class="perk"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="8.5" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M3 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M13 14.3c.9-.2 1.9-.3 3-.3 3 0 5 2 5 5"/></svg></span>Meet<br>new people</div>
+          <div class="perk"><span class="ic"><svg viewBox="0 0 24 24"><path d="M6 8v8M9 6v12M15 6v12M18 8v8M9 12h6M3 12h3M18 12h3"/></svg></span>Find<br>workout partners</div>
+          <div class="perk"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 4c4.9 0 8.5 3.1 8.5 7s-3.6 7-8.5 7c-1 0-2-.1-2.9-.4L4.5 20l1.2-3.6C4.3 15 3.5 13.1 3.5 11c0-3.9 3.6-7 8.5-7z"/></svg></span>Better<br>nights out</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="photo-card">
+          <img src="images/hero.jpg" alt="Black SYGNAL watch with a digital time display and glowing light strip">
+          <div class="mode-chip" aria-live="polite"><i></i><span><b id="chip-name">Open</b><small id="chip-text">Open to conversation</small></span></div>
+        </div>
+        <div class="note note-1 hand" aria-hidden="true">Tells time.<br>Tells the room<br>how you feel.</div>
+        <div class="inset"><img src="images/detail.jpg" alt="Side button used to change modes"></div>
+        <div class="note note-2 hand" aria-hidden="true">Press or rotate to change modes</div>
+      </div>
+    </header>
+
+    <div class="window">
+      <div class="win">
+        <div class="win-bar">
+          <div class="lights"><i></i><i></i><i></i></div>
+          <span>SYGNAL for Hosts</span>
+          <div class="venues" role="group" aria-label="Choose a venue">
+            <button data-venue="rooftop" aria-pressed="true">Rooftop</button>
+            <button data-venue="gym" aria-pressed="false">Gym</button>
+            <button data-venue="campus" aria-pressed="false">Campus</button>
+          </div>
+          <span class="live"><i></i>Live</span>
+        </div>
+        <div class="win-body">
+          <aside class="side">
+            <div class="venue"><span id="v-name">Rooftop Social</span><small id="v-time">Friday, 10:40 pm</small></div>
+            <h4>Signals in the room</h4>
+            <div class="stat" style="--c:var(--open)"><i></i><span>Open</span><b id="n-open">0</b></div>
+            <div class="stat" style="--c:var(--social)"><i></i><span>Social</span><b id="n-social">0</b></div>
+            <div class="stat" style="--c:var(--focus)"><i></i><span>Focus</span><b id="n-focus">0</b></div>
+            <div class="bar" aria-hidden="true"><span id="b-open" style="background:var(--open)"></span><span id="b-social" style="background:var(--social)"></span><span id="b-focus" style="background:var(--focus)"></span></div>
+          </aside>
+          <div class="room" id="room" aria-label="Animated room map showing people by signal color">
+            <div class="zone" id="z0"></div><div class="zone" id="z1"></div><div class="zone" id="z2"></div><div class="zone" id="z3"></div>
+            <div class="toast"><i></i><span><b id="toast-b">12 new Open signals</b><small>in the last 10 minutes</small></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="modes">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker"><i></i>The modes</span>
+        <h2>One band. Three signals. <span class="soft">Read in a glance.</span></h2>
+        <p>The light ring does the talking, so you never have to explain whether now's a good time.</p>
+      </div>
+      <div class="modes">
+        <button class="mode" data-mode="open" aria-pressed="true" style="--c:var(--open)">
+          <div class="pic"><img src="images/m-open.jpg" alt="SYGNAL band glowing green"></div>
+          <div class="txt">
+            <div class="mode-top"><h3>Open</h3><span class="dot"><i></i>Green</span></div>
+            <p>Open to conversation and meeting new people.</p>
+            <div class="tells"><span>Tells others</span><b>Come say hi</b></div>
+          </div>
+        </button>
+        <button class="mode" data-mode="social" aria-pressed="false" style="--c:var(--social)">
+          <div class="pic"><img src="images/m-social.jpg" alt="SYGNAL band glowing blue"></div>
+          <div class="txt">
+            <div class="mode-top"><h3>Social</h3><span class="dot"><i></i>Blue</span></div>
+            <p>Down for a workout partner, a dance, or a friendly chat.</p>
+            <div class="tells"><span>Tells others</span><b>Friendly, not flirting</b></div>
+          </div>
+        </button>
+        <button class="mode" data-mode="focus" aria-pressed="false" style="--c:var(--focus)">
+          <div class="pic"><img src="images/m-focus.jpg" alt="SYGNAL band glowing red"></div>
+          <div class="txt">
+            <div class="mode-top"><h3>Focus</h3><span class="dot"><i></i>Red</span></div>
+            <p>Prefer to be left alone right now.</p>
+            <div class="tells"><span>Tells others</span><b>Give me space</b></div>
+          </div>
+        </button>
+      </div>
+      <p class="press hand">Press the button or rotate the band to switch, anytime.</p>
+    </div>
+  </section>
+
+  <section id="everywhere" style="padding-top:20px">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker"><i></i>Where to wear</span>
+        <h2>Same room. <span class="soft">More connection.</span></h2>
+      </div>
+      <div class="gallery">
+        <div class="shot" style="--c:var(--open)"><img src="images/w-open.jpg" alt="Wrist wearing SYGNAL in green Open mode"><span class="tag"><i></i>Open</span><div class="cap"><b>Between sets, say hello.</b><span>Meet the regulars you've nodded at for months.</span></div></div>
+        <div class="shot" style="--c:var(--social)"><img src="images/w-social.jpg" alt="Wrist wearing SYGNAL in blue Social mode"><span class="tag"><i></i>Social</span><div class="cap"><b>Find your spotter.</b><span>Partner up for a lift, a run, or a round.</span></div></div>
+        <div class="shot" style="--c:var(--focus)"><img src="images/w-focus.jpg" alt="Wrist wearing SYGNAL in red Focus mode"><span class="tag"><i></i>Focus</span><div class="cap"><b>Headphones in. World out.</b><span>Train, study, or recharge in peace.</span></div></div>
+      </div>
+      <div class="scenes">
+        <div class="scene"><b>Gyms</b><p>Workout partners without the awkward interruption.</p></div>
+        <div class="scene"><b>Campus</b><p>Make friends on the quad, focus in the library.</p></div>
+        <div class="scene"><b>Nightlife</b><p>Rooftops and lounges where people know who's open.</p></div>
+        <div class="scene"><b>Singles events</b><p>Mixers where everyone arrives with a signal.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="finishes" style="padding-top:20px">
+    <div class="wrap finish">
+      <div class="finish-photo"><img src="images/colors.jpg" alt="SYGNAL bands in black, white, blush, and sage"></div>
+      <div class="finish-panel">
+        <span class="kicker"><i></i>Finishes</span>
+        <h3>Your style on the band. Your signal in the light.</h3>
+        <p>Four soft-touch colorways that go from the squat rack to the rooftop.</p>
+        <div class="swatches" role="group" aria-label="Band finish">
+          <button class="sw" aria-pressed="true" style="--s:#1B1A1E"><i></i><b>Black</b><small>Classic and bold</small></button>
+          <button class="sw" aria-pressed="false" style="--s:#EDEAE4"><i></i><b>White</b><small>Clean and minimal</small></button>
+          <button class="sw" aria-pressed="false" style="--s:#E2B8AA"><i></i><b>Blush</b><small>Stylish and subtle</small></button>
+          <button class="sw" aria-pressed="false" style="--s:#9DB39C"><i></i><b>Sage</b><small>Modern and fresh</small></button>
+        </div>
+        <p class="finish-note hand" id="finish-note">Black goes with everything.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" style="padding-top:20px">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker"><i></i>Details</span>
+        <h2>Designed to be worn. <span class="soft">Engineered to be read.</span></h2>
+      </div>
+      <div class="bento">
+        <div class="tile t-a">
+          <h3>Press or rotate</h3>
+          <p>A single side button cycles your signal. No app, no menus, no pulling out your phone.</p>
+          <div class="dial"><div class="knob" id="knob"></div>
+            <ul><li data-l="open" class="on">Open</li><li data-l="social">Social</li><li data-l="focus">Focus</li></ul></div>
+        </div>
+        <div class="tile t-b">
+          <h3>Readable across the room</h3>
+          <p>A soft light ring tuned to be clear in dim bars and bright gyms without being loud.</p>
+          <div class="big">30<small>ft visibility</small></div>
+        </div>
+        <div class="tile t-c">
+          <h3>Hosts see the room</h3>
+          <p>A live signal mix for your venue, so you can time mixers and group classes.</p>
+          <svg class="spark" viewBox="0 0 300 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 58 C 30 55, 45 48, 70 46 S 110 30, 140 34 S 190 14, 220 18 S 270 6, 300 8" fill="none" stroke-width="2.5"/></svg>
+        </div>
+        <div class="tile t-d">
+          <h3>Respect is the rule</h3>
+          <p>Red means no. Partner venues post the code and staff back it up.</p>
+          <div class="mini"><div style="--c:var(--focus)"><i></i>Focus honored<span>Always</span></div><div style="--c:var(--open)"><i></i>Open, not obligated<span>Always</span></div></div>
+        </div>
+        <div class="tile t-e">
+          <h3>A real digital watch</h3>
+          <p>A crisp always-on time display, plus a week of battery for workouts and nights out.</p>
+          <div class="big">7<small>days</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="stories" style="padding-top:20px">
+    <div class="wrap">
+      <div class="head"><span class="kicker"><i></i>From the pilot</span><h2>People are already <span class="soft">talking.</span></h2></div>
+      <div class="quotes">
+        <div class="quote big-q" style="--c:var(--open)"><q>I wore green for one night and had more real conversations than a month of swiping.</q><div class="who"><span class="av"></span><span>Jordan, 24<small>Pilot member</small></span></div></div>
+        <div class="quote" style="--c:var(--social)"><q>Found a lifting partner in my first week. I'd been too nervous to ask anyone for a year.</q><div class="who"><span class="av"></span><span>Alexis, 29<small>Gym member</small></span></div></div>
+        <div class="quote" style="--c:var(--focus)"><q>Finals week, red on. Nobody interrupted me once. That alone is worth it.</q><div class="who"><span class="av"></span><span>Priya, 20<small>University student</small></span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" style="padding-top:20px">
+    <div class="wrap">
+      <div class="head"><span class="kicker"><i></i>Pricing</span><h2>Pick your plan.</h2><p>Every band includes all three modes. Hosts can outfit a whole room.</p></div>
+      <div class="plans">
+        <div class="plan"><h3>Solo</h3><div class="price">$89</div><p class="muted">One band, every mood.</p>
+          <ul><li>SYGNAL band in your finish</li><li>Magnetic charger</li><li>SYGNAL nights waitlist</li></ul>
+          <a class="btn btn-ghost" href="#join">Reserve Solo</a></div>
+        <div class="plan featured"><span class="badge">Most popular</span><h3>Crew</h3><div class="price">$239 <small>/ 3 bands</small></div><p class="muted">For roommates, lifting partners, and friend groups.</p>
+          <ul><li>Three bands, mix any finishes</li><li>Founding member pricing</li><li>Priority access to SYGNAL nights</li><li>Limited founders edition box</li></ul>
+          <a class="btn btn-primary" href="#join">Reserve Crew</a></div>
+        <div class="plan"><h3>Host</h3><div class="price">Custom</div><p class="muted">Gyms, venues, campus orgs, and event producers.</p>
+          <ul><li>Bulk bands from 50 members</li><li>Live room dashboard</li><li>Co-branded signage kit</li><li>Launch support</li></ul>
+          <a class="btn btn-ghost" href="#join">Talk to us</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" style="padding-top:20px">
+    <div class="wrap">
+      <div class="head"><h2>Questions, answered.</h2></div>
+      <div class="faq">
+        <details open><summary>Is SYGNAL a watch?</summary><p>Yes. The face is a digital watch display that shows the time, while the light ring around it shows your mode.</p></details>
+        <details><summary>How do I change modes?</summary><p>Press the side button or rotate the band. The light ring switches between green, blue, and red instantly.</p></details>
+        <details><summary>Does green mean I have to talk to anyone who approaches?</summary><p>Never. Open means you're up for meeting people, not that you owe anyone your time. Switch to red whenever you like.</p></details>
+        <details><summary>Do I need an app?</summary><p>No. The band works on its own. Hosts get a live room dashboard, and a member app for SYGNAL nights is on the way.</p></details>
+        <details><summary>Can my gym or venue run SYGNAL nights?</summary><p>Yes. Choose the Host plan and we'll help you set up bands, signage, and the room dashboard.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap" id="join">
+    <div class="cta">
+      <div class="wm" aria-hidden="true">SYGNAL</div>
+      <h2>Wear your intention.</h2>
+      <p class="hand">Same room. More connection.</p>
+      <p>Join the waitlist for founding pricing and first access to SYGNAL nights in your city.</p>
+      <form id="wait" novalidate>
+        <label for="email" style="position:absolute;left:-9999px">Email address</label>
+        <input id="email" type="email" placeholder="you@email.com" autocomplete="email">
+        <button class="btn btn-primary" type="submit">Get early access</button>
+      </form>
+      <p class="msg" id="msg" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <footer>
+      <span class="wm" style="font-size:13px">SYGNAL</span>
+      <span>© 2026 SYGNAL. Simple signals. Real connections.</span>
+      <div class="fl"><a href="#modes">Modes</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#join">Instagram</a></div>
+    </footer>
+  </div>
+</main>
+
+<script>
+(function(){
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const modes = ['open','social','focus'];
+  const info = { open:['Open','Open to conversation'], social:['Social','Down for a friendly chat'], focus:['Focus','Prefer to be left alone'] };
+  let mode = 'open', touched = false;
+
+  function setMode(m){
+    mode = m;
+    root.style.setProperty('--active','var(--'+m+')');
+    document.getElementById('chip-name').textContent = info[m][0];
+    document.getElementById('chip-text').textContent = info[m][1];
+    document.querySelectorAll('.mode').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
+    document.querySelectorAll('.dial li').forEach(l => l.classList.toggle('on', l.dataset.l === m));
+    document.getElementById('knob').style.setProperty('--rot', (-modes.indexOf(m)*120) + 'deg');
+  }
+  document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => { touched = true; setMode(b.dataset.mode); }));
+  document.getElementById('knob').addEventListener('click', () => { touched = true; setMode(modes[(modes.indexOf(mode)+1)%3]); });
+  if (!reduce) setInterval(() => { if (!touched) setMode(modes[(modes.indexOf(mode)+1)%3]); }, 3400);
+
+  // Finishes
+  const notes = { Black:'Black goes with everything.', White:'White keeps it clean.', Blush:'Blush adds a little warmth.', Sage:'Sage feels fresh and easy.' };
+  document.querySelectorAll('.sw').forEach(s => s.addEventListener('click', () => {
+    document.querySelectorAll('.sw').forEach(x => x.setAttribute('aria-pressed', x === s));
+    document.getElementById('finish-note').textContent = notes[s.querySelector('b').textContent];
+  }));
+
+  // Live room
+  const venues = {
+    rooftop:{name:'Rooftop Social',time:'Friday, 10:40 pm',zones:['Bar','Dance floor','Lounge','Terrace'],mix:[.46,.36],toast:'12 new Open signals'},
+    gym:{name:'Iron District Gym',time:'Tuesday, 6:15 pm',zones:['Free weights','Cardio','Stretch area','Racks'],mix:[.24,.38],toast:'5 people looking for a partner'},
+    campus:{name:'Student Union',time:'Wednesday, 1:20 pm',zones:['Cafe','Commons','Study hall','Patio'],mix:[.3,.3],toast:'18 students heads-down in Focus'}
+  };
+  const boxes = [[5,8,34,38],[48,8,46,30],[5,58,28,34],[52,52,42,40]];
+  const room = document.getElementById('room');
+  let seed = 11; const rnd = () => (seed = (seed*9301+49297)%233280)/233280;
+  let venue = venues.rooftop;
+  const guests = [];
+  for (let i=0;i<46;i++){ const el=document.createElement('span'); el.className='guest'; room.appendChild(el); guests.push({el,type:'open'}); }
+
+  function pickType(){ const r=rnd(); return r<venue.mix[0]?'open':r<venue.mix[0]+venue.mix[1]?'social':'focus'; }
+  function place(g){
+    let zi = Math.floor(rnd()*4);
+    if (g.type==='focus' && rnd()<.6) zi = 2;
+    const b = boxes[zi];
+    g.el.style.left = (b[0]+3 + rnd()*(b[2]-6)) + '%';
+    g.el.style.top  = (b[1]+8 + rnd()*(b[3]-12)) + '%';
+    g.el.style.setProperty('--c','var(--'+g.type+')');
+    g.el.classList.toggle('ping', g.type==='open' && rnd()<.25);
+  }
+  function tally(){
+    const c={open:0,social:0,focus:0}; guests.forEach(g=>c[g.type]++);
+    modes.forEach(m=>{ document.getElementById('n-'+m).textContent=c[m]; document.getElementById('b-'+m).style.width=(c[m]/guests.length*100)+'%'; });
+  }
+  function setVenue(key){
+    venue = venues[key];
+    document.getElementById('v-name').textContent = venue.name;
+    document.getElementById('v-time').textContent = venue.time;
+    document.getElementById('toast-b').textContent = venue.toast;
+    boxes.forEach((b,i)=>{ const z=document.getElementById('z'+i); z.textContent=venue.zones[i]; Object.assign(z.style,{left:b[0]+'%',top:b[1]+'%',width:b[2]+'%',height:b[3]+'%'}); });
+    document.querySelectorAll('[data-venue]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.venue===key));
+    guests.forEach(g=>{ g.type=pickType(); place(g); }); tally();
+  }
+  document.querySelectorAll('[data-venue]').forEach(b=>b.addEventListener('click',()=>setVenue(b.dataset.venue)));
+  setVenue('rooftop');
+  if (!reduce) setInterval(()=>{
+    for (let k=0;k<6;k++){ const g=guests[Math.floor(rnd()*guests.length)]; if (rnd()<.35) g.type=pickType(); place(g); }
+    tally();
+  },2200);
+
+  document.getElementById('wait').addEventListener('submit', e=>{
+    e.preventDefault();
+    const v=document.getElementById('email').value.trim();
+    document.getElementById('msg').textContent = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+      ? "You're on the list. We'll email you before the founding drop."
+      : 'Enter a full email address, like you@email.com.';
+  });
+  setMode('open');
+})();
+</script>
+</body>
+</html>
