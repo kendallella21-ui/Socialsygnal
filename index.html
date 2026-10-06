@@ -82,6 +82,14 @@ h1 .soft{color:var(--ink-3);font-weight:300}
 .photo-card{position:relative;border-radius:28px;overflow:hidden;background:var(--photo);border:1px solid var(--line);box-shadow:var(--shadow);aspect-ratio:372/450}
 .photo-card img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
 .photo-card::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 40% at 58% 52%, color-mix(in srgb,var(--active) 26%,transparent), transparent 70%);mix-blend-mode:soft-light;transition:background 1s}
+/* Light strip on the hero band picks up the current mode color */
+.strip{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.strip path{fill:none;stroke:var(--active);stroke-linecap:round;transition:stroke .8s}
+.strip-tint{mix-blend-mode:color}
+.strip-tint path{stroke-width:3.2}
+.strip-glow{mix-blend-mode:screen}
+.strip-glow path{stroke-width:2.6;opacity:.75;filter:blur(3px)}
+.strip-glow path.halo{stroke-width:9;opacity:.35;filter:blur(10px)}
 .note{position:absolute;font-size:26px;transform:rotate(-6deg)}
 .note svg{display:block;width:70px;height:50px;stroke:var(--ink-2);fill:none;stroke-width:1.6;stroke-linecap:round}
 .note-1{top:28px;right:-26px;text-align:right}
@@ -103,7 +111,7 @@ h1 .soft{color:var(--ink-3);font-weight:300}
 .venues{display:flex;gap:4px;padding:3px;border-radius:9px;background:var(--bg-2);border:1px solid var(--line)}
 .venues button{border:0;background:transparent;color:var(--ink-3);font:500 12px var(--sans);padding:4px 10px;border-radius:6px;cursor:pointer}
 .venues button[aria-pressed="true"]{background:var(--panel-solid);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.win-body{display:grid;grid-template-columns:260px 1fr;min-height:420px}
+.win-body{display:grid;grid-template-columns:260px 1fr;min-height:470px}
 .side{border-right:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:14px}
 .side h4{font-size:12px;font-weight:500;color:var(--ink-3);margin-top:6px}
 .venue{font-size:15px;font-weight:500}
@@ -149,6 +157,52 @@ h2 .soft{color:var(--ink-3);font-weight:300}
 .mode .tells{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;display:flex;justify-content:space-between;color:var(--ink-3)}
 .mode .tells b{color:var(--ink);font-weight:500}
 .press{text-align:center;margin-top:30px;font-size:28px}
+
+/* App: tap to connect */
+.app-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:stretch}
+.app-demo{border-radius:24px;border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);padding:26px;display:flex;flex-direction:column;gap:20px}
+.tap-stage{position:relative;height:150px;border-radius:18px;background:var(--bg-2);border:1px solid var(--line);overflow:hidden;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.pill{position:absolute;top:50%;width:120px;height:46px;margin-top:-23px;border-radius:23px;background:#141317;border:3px solid #26252B;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.pill::before{content:"";position:absolute;inset:5px;border-radius:16px;border:2px solid var(--open);box-shadow:0 0 14px var(--open),inset 0 0 8px color-mix(in srgb,var(--open) 40%,transparent)}
+.pill::after{content:attr(data-who);position:absolute;top:calc(100% + 10px);left:0;right:0;text-align:center;font-size:12px;color:var(--ink-3)}
+.pill.a{left:12%}.pill.b{right:12%}
+.app-demo.tapped .pill.a{transform:translateX(calc(var(--gap,0px)))}
+.app-demo.tapped .pill.b{transform:translateX(calc(var(--gap,0px) * -1))}
+.spark{position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px;border-radius:50%;background:#fff;box-shadow:0 0 30px 12px var(--open);opacity:0;transform:scale(.3)}
+.app-demo.tapped .spark{animation:spark .9s .55s ease-out forwards}
+@keyframes spark{0%{opacity:0;transform:scale(.3)}30%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(2.4)}}
+.phones{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.phone{border-radius:20px;border:1px solid var(--line-2);background:var(--panel-solid);padding:16px;min-height:178px;display:flex;flex-direction:column;gap:10px}
+.phone-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-3)}
+.phone-top b{color:var(--ink);font-weight:600;font-size:13px}
+.phone-msg{font-size:14px;line-height:1.4;color:var(--ink-2);flex:1}
+.phone-msg strong{color:var(--ink);font-weight:500}
+.phone-actions{display:flex;gap:6px}
+.phone-actions button{flex:1;height:34px;border-radius:9px;font:500 13px var(--sans);cursor:pointer;border:1px solid var(--line-2);background:transparent;color:var(--ink)}
+.phone-actions .allow{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.phone-actions button:disabled{opacity:.35;cursor:default}
+.status{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line-2);width:fit-content}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--c,var(--ink-3))}
+.contact{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;background:var(--bg-2);border:1px solid var(--line)}
+.contact .av{width:32px;height:32px}
+.contact small{display:block;color:var(--ink-3);font-size:12px}
+.demo-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.demo-bar p{font-size:13px;color:var(--ink-3)}
+.app-side{display:flex;flex-direction:column;gap:16px}
+.steps{list-style:none;border-radius:24px;border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);padding:10px 26px}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:14px;padding:18px 0}
+.steps li + li{border-top:1px solid var(--line)}
+.steps .n{width:30px;height:30px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;font-size:13px;font-weight:500}
+.steps b{display:block;font-weight:500;font-size:17px;letter-spacing:-.02em}
+.steps p{font-size:14px;color:var(--ink-2);margin-top:2px}
+.pulse-card{border-radius:24px;padding:26px;background:#0B0A0E;color:#F3F1EE;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;position:relative;overflow:hidden}
+.pulse-card h3{font-size:20px;font-weight:500;letter-spacing:-.03em}
+.pulse-card p{font-size:14px;color:rgba(243,241,238,.7);margin-top:6px}
+.pulse-pair{display:flex;flex-direction:column;gap:12px}
+.pulse-pair span{display:block;width:84px;height:30px;border-radius:15px;border:2px solid var(--open);background:#141317;animation:mutual 1.6s ease-in-out infinite}
+.pulse-pair span:nth-child(2){animation-delay:.2s}
+@keyframes mutual{0%,100%{box-shadow:0 0 6px var(--open);border-color:color-mix(in srgb,var(--open) 60%,transparent)}50%{box-shadow:0 0 26px 6px var(--open);border-color:var(--open)}}
 
 /* Gallery */
 .gallery{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:16px;align-items:stretch}
@@ -264,8 +318,8 @@ footer .fl{display:flex;gap:24px}
   .win-body{grid-template-columns:1fr}
   .side{border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
   .side .venue,.side h4,.side .bar{grid-column:1/-1}
-  .room{min-height:340px}
-  .modes,.plans,.quotes,.gallery,.finish{grid-template-columns:1fr}
+  .room{min-height:400px}
+  .modes,.plans,.quotes,.gallery,.finish,.app-grid{grid-template-columns:1fr}
   .shot{min-height:340px}
   .scenes{grid-template-columns:1fr 1fr}
   .scene,.scene + .scene{padding:20px 16px 20px 0;border-left:0;border-bottom:1px solid var(--line)}
@@ -280,6 +334,9 @@ footer .fl{display:flex;gap:24px}
   .swatches{grid-template-columns:1fr 1fr}
   .toast{left:12px;right:12px}
   .perks{gap:18px}
+  .pill{width:84px}.pill.a{left:8%}.pill.b{right:8%}
+  .phone{padding:12px}
+  .pulse-card{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
@@ -293,6 +350,7 @@ footer .fl{display:flex;gap:24px}
       <a class="wm" href="#top" aria-label="SYGNAL home">SYGNAL</a>
       <ul class="links">
         <li><a href="#modes">Modes</a></li>
+        <li><a href="#app">App</a></li>
         <li><a href="#everywhere">Where to wear</a></li>
         <li><a href="#finishes">Finishes</a></li>
         <li><a href="#pricing">Pricing</a></li>
@@ -312,7 +370,7 @@ footer .fl{display:flex;gap:24px}
       <div>
         <div class="wm hero-wm" aria-hidden="true">SYGNAL</div>
         <p class="tagline">Simple signals. Real connections.</p>
-        <h1>Wear your intention. <span class="soft">Skip the guesswork.</span></h1>
+        <h1><span class="soft">Say nothing.</span> SYGNAL everything.</h1>
         <p class="sub">SYGNAL is a minimal digital watch with a light ring that glows green, blue, or red, so everyone can see whether you want to meet someone, just be social, or be left alone.</p>
         <div class="hero-cta">
           <a class="btn btn-primary btn-lg" href="#join">Get early access</a>
@@ -328,6 +386,8 @@ footer .fl{display:flex;gap:24px}
       <div class="stage">
         <div class="photo-card">
           <img src="hero.jpg" alt="Black SYGNAL watch with a digital time display and glowing light strip">
+          <svg class="strip strip-tint" viewBox="0 0 100 120.97" preserveAspectRatio="none" aria-hidden="true"><path d="M77 30.24 C76.33 30.64 74.00 31.65 73 32.66 C72.00 33.67 71.50 35.08 71 36.29 C70.50 37.50 70.33 38.71 70 39.92 C69.67 41.13 69.33 42.34 69 43.55 C68.67 44.76 68.33 45.97 68 47.18 C67.67 48.39 67.33 49.60 67 50.81 C66.67 52.02 66.33 53.23 66 54.44 C65.67 55.65 65.33 56.85 65 58.06 C64.67 59.27 64.33 60.48 64 61.69 C63.67 62.90 63.33 64.11 63 65.32 C62.67 66.53 62.33 67.74 62 68.95 C61.67 70.16 61.40 71.37 61 72.58 C60.60 73.79 60.02 75.00 59.6 76.21 C59.18 77.42 58.83 78.63 58.5 79.84 C58.17 81.05 57.75 82.26 57.6 83.47 C57.45 84.68 57.40 85.89 57.6 87.1 C57.80 88.31 58.32 89.72 58.8 90.73 C59.28 91.74 60.22 92.75 60.5 93.15"/></svg>
+          <svg class="strip strip-glow" viewBox="0 0 100 120.97" preserveAspectRatio="none" aria-hidden="true"><path class="halo" d="M77 30.24 C76.33 30.64 74.00 31.65 73 32.66 C72.00 33.67 71.50 35.08 71 36.29 C70.50 37.50 70.33 38.71 70 39.92 C69.67 41.13 69.33 42.34 69 43.55 C68.67 44.76 68.33 45.97 68 47.18 C67.67 48.39 67.33 49.60 67 50.81 C66.67 52.02 66.33 53.23 66 54.44 C65.67 55.65 65.33 56.85 65 58.06 C64.67 59.27 64.33 60.48 64 61.69 C63.67 62.90 63.33 64.11 63 65.32 C62.67 66.53 62.33 67.74 62 68.95 C61.67 70.16 61.40 71.37 61 72.58 C60.60 73.79 60.02 75.00 59.6 76.21 C59.18 77.42 58.83 78.63 58.5 79.84 C58.17 81.05 57.75 82.26 57.6 83.47 C57.45 84.68 57.40 85.89 57.6 87.1 C57.80 88.31 58.32 89.72 58.8 90.73 C59.28 91.74 60.22 92.75 60.5 93.15"/><path d="M77 30.24 C76.33 30.64 74.00 31.65 73 32.66 C72.00 33.67 71.50 35.08 71 36.29 C70.50 37.50 70.33 38.71 70 39.92 C69.67 41.13 69.33 42.34 69 43.55 C68.67 44.76 68.33 45.97 68 47.18 C67.67 48.39 67.33 49.60 67 50.81 C66.67 52.02 66.33 53.23 66 54.44 C65.67 55.65 65.33 56.85 65 58.06 C64.67 59.27 64.33 60.48 64 61.69 C63.67 62.90 63.33 64.11 63 65.32 C62.67 66.53 62.33 67.74 62 68.95 C61.67 70.16 61.40 71.37 61 72.58 C60.60 73.79 60.02 75.00 59.6 76.21 C59.18 77.42 58.83 78.63 58.5 79.84 C58.17 81.05 57.75 82.26 57.6 83.47 C57.45 84.68 57.40 85.89 57.6 87.1 C57.80 88.31 58.32 89.72 58.8 90.73 C59.28 91.74 60.22 92.75 60.5 93.15"/></svg>
           <div class="mode-chip" aria-live="polite"><i></i><span><b id="chip-name">Open</b><small id="chip-text">Open to conversation</small></span></div>
         </div>
         <div class="note note-1 hand" aria-hidden="true">Tells time.<br>Tells the room<br>how you feel.</div>
@@ -400,6 +460,50 @@ footer .fl{display:flex;gap:24px}
         </button>
       </div>
       <p class="press hand">Press the button or rotate the band to switch, anytime.</p>
+    </div>
+  </section>
+
+  <section id="app" style="padding-top:20px">
+    <div class="wrap">
+      <div class="head">
+        <span class="kicker"><i></i>The SYGNAL app</span>
+        <h2>Tap bands. <span class="soft">Both say yes.</span></h2>
+        <p>Hold your bracelets together to swap info through the app. Nothing is shared until each person allows it.</p>
+      </div>
+      <div class="app-grid">
+        <div class="app-demo" id="app-demo">
+          <div class="tap-stage" id="tap-stage">
+            <div class="pill a" data-who="You"></div>
+            <div class="spark"></div>
+            <div class="pill b" data-who="Maya"></div>
+          </div>
+          <div class="phones">
+            <div class="phone" id="phone-you">
+              <div class="phone-top"><b>You</b><span>SYGNAL</span></div>
+              <div class="phone-msg">Hold your band to someone else's to start.</div>
+            </div>
+            <div class="phone" id="phone-maya">
+              <div class="phone-top"><b>Maya</b><span>SYGNAL</span></div>
+              <div class="phone-msg">Hold your band to someone else's to start.</div>
+            </div>
+          </div>
+          <div class="demo-bar">
+            <p id="demo-hint">Try it: tap the bands together.</p>
+            <button class="btn btn-primary" id="tap-btn" type="button">Tap bands together</button>
+          </div>
+        </div>
+        <div class="app-side">
+          <ol class="steps">
+            <li><span class="n">1</span><div><b>Hold your bands together</b><p>A quick tap between two SYGNAL bands starts a connection request in the app.</p></div></li>
+            <li><span class="n">2</span><div><b>Each person allows it</b><p>You both get a prompt. Your info only goes out when you say so, and you never receive anything the other person didn't approve.</p></div></li>
+            <li><span class="n">3</span><div><b>You're connected</b><p>Once both people allow it, your contact details land in each other's app. Decline, and nothing is shared.</p></div></li>
+          </ol>
+          <div class="pulse-card">
+            <div class="pulse-pair" aria-hidden="true"><span></span><span></span></div>
+            <div><h3>When it's mutual, your band pulses.</h3><p>If you're interested in someone and they're interested in you too, both bands pulse your color, so you know the interest is real.</p></div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -513,7 +617,8 @@ footer .fl{display:flex;gap:24px}
         <details open><summary>Is SYGNAL a watch?</summary><p>Yes. The face is a digital watch display that shows the time, while the light ring around it shows your mode.</p></details>
         <details><summary>How do I change modes?</summary><p>Press the side button or rotate the band. The light ring switches between green, blue, and red instantly.</p></details>
         <details><summary>Does green mean I have to talk to anyone who approaches?</summary><p>Never. Open means you're up for meeting people, not that you owe anyone your time. Switch to red whenever you like.</p></details>
-        <details><summary>Do I need an app?</summary><p>No. The band works on its own. Hosts get a live room dashboard, and a member app for SYGNAL nights is on the way.</p></details>
+        <details><summary>Do I need an app?</summary><p>The band shows your signal on its own. The SYGNAL app is how you swap info: tap bands together, and your details only go through once each person allows it.</p></details>
+        <details><summary>Can someone get my info without my permission?</summary><p>No. Tapping bands only sends a request. Your details are shared only after you allow it in the app, and you can always decline.</p></details>
         <details><summary>Can my gym or venue run SYGNAL nights?</summary><p>Yes. Choose the Host plan and we'll help you set up bands, signage, and the room dashboard.</p></details>
       </div>
     </div>
@@ -571,13 +676,60 @@ footer .fl{display:flex;gap:24px}
     document.getElementById('finish-note').textContent = notes[s.querySelector('b').textContent];
   }));
 
+  // App: tap to connect demo
+  const demo = document.getElementById('app-demo');
+  const tapBtn = document.getElementById('tap-btn');
+  const hint = document.getElementById('demo-hint');
+  const people = { you:{other:'Maya', handle:'@maya.lifts', c:'var(--social)'}, maya:{other:'you', handle:'@you', c:'var(--open)'} };
+  let allowed = {}, step = 'idle';
+  function msg(id, html){ document.querySelector('#phone-'+id).innerHTML = '<div class="phone-top"><b>'+(id==='you'?'You':'Maya')+'</b><span>SYGNAL</span></div>' + html; }
+  function idle(){
+    step='idle'; allowed={}; demo.classList.remove('tapped');
+    ['you','maya'].forEach(id=>msg(id,'<div class="phone-msg">Hold your band to someone else\'s to start.</div>'));
+    hint.textContent='Try it: tap the bands together.'; tapBtn.textContent='Tap bands together';
+  }
+  function ask(id){
+    const p=people[id];
+    msg(id,'<div class="phone-msg">Share your contact with <strong>'+p.other+'</strong>?</div>'+
+      '<div class="phone-actions"><button class="allow" data-id="'+id+'" data-a="allow">Allow</button><button data-id="'+id+'" data-a="no">Not now</button></div>');
+  }
+  function waiting(id){ msg(id,'<div class="phone-msg">You allowed it. Waiting for '+(id==='you'?'Maya':'you')+' to allow too.</div><span class="status" style="--c:var(--social)"><i></i>Pending</span>'); }
+  function connected(){
+    step='done';
+    ['you','maya'].forEach(id=>{ const p=people[id];
+      msg(id,'<span class="status" style="--c:var(--open)"><i></i>Connected</span><div class="contact"><span class="av" style="--c:'+p.c+'"></span><span>'+(id==='you'?'Maya':'You')+'<small>'+p.handle+'</small></span></div>'); });
+    hint.textContent='Both allowed it, so info went through.'; tapBtn.textContent='Reset';
+  }
+  function declined(id){
+    step='done';
+    msg(id,'<div class="phone-msg">You declined. Nothing was shared.</div><span class="status" style="--c:var(--focus)"><i></i>Declined</span>');
+    msg(id==='you'?'maya':'you','<div class="phone-msg">No connection this time. Your info stayed private too.</div>');
+    hint.textContent='One person said no, so nothing was shared either way.'; tapBtn.textContent='Reset';
+  }
+  function setGap(){ const st=document.getElementById('tap-stage').getBoundingClientRect(); const pill=demo.querySelector('.pill.a').getBoundingClientRect();
+    demo.style.setProperty('--gap', Math.max(0,(st.left+st.width/2)-pill.right) + 'px'); }
+  tapBtn.addEventListener('click',()=>{
+    if(step!=='idle'){ idle(); return; }
+    setGap(); demo.classList.add('tapped'); step='asking';
+    hint.textContent='Request sent. Each person decides for themselves.'; tapBtn.textContent='Reset';
+    setTimeout(()=>{ if(step==='asking'){ ask('you'); ask('maya'); } }, 900);
+  });
+  demo.addEventListener('click',e=>{
+    const b=e.target.closest('[data-a]'); if(!b||step!=='asking') return;
+    if(b.dataset.a==='no') return declined(b.dataset.id);
+    allowed[b.dataset.id]=true;
+    if(allowed.you && allowed.maya) connected(); else waiting(b.dataset.id);
+  });
+  addEventListener('resize',()=>{ if(demo.classList.contains('tapped')) setGap(); });
+
   // Live room
   const venues = {
     rooftop:{name:'Rooftop Social',time:'Friday, 10:40 pm',zones:['Bar','Dance floor','Lounge','Terrace'],mix:[.46,.36],toast:'12 new Open signals'},
     gym:{name:'Iron District Gym',time:'Tuesday, 6:15 pm',zones:['Free weights','Cardio','Stretch area','Racks'],mix:[.24,.38],toast:'5 people looking for a partner'},
     campus:{name:'Student Union',time:'Wednesday, 1:20 pm',zones:['Cafe','Commons','Study hall','Patio'],mix:[.3,.3],toast:'18 students heads-down in Focus'}
   };
-  const boxes = [[5,8,34,38],[48,8,46,30],[5,58,28,34],[52,52,42,40]];
+  // Zones end at 76% of the map height so the bottom strip stays clear for the notification
+  const boxes = [[5,6,34,32],[48,6,46,26],[5,44,30,32],[52,40,42,36]];
   const room = document.getElementById('room');
   let seed = 11; const rnd = () => (seed = (seed*9301+49297)%233280)/233280;
   let venue = venues.rooftop;
