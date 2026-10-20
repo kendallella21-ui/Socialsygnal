@@ -3,408 +3,372 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SYGNAL — Simple signals. Real connections.</title>
+<title>SYGNAL — Say nothing. SYGNAL everything.</title>
+<meta name="description" content="SYGNAL is a minimal digital watch with a light ring that glows green, blue, or red, so the room knows whether you want to meet someone, be social, or be left alone.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ECE9E5; --bg-2:#F4F2EF; --panel:rgba(250,249,247,.78); --panel-solid:#FAF9F7; --photo:#E3E0DC;
-  --ink:#141317; --ink-2:#55525C; --ink-3:#8D8993; --line:rgba(20,19,23,.09); --line-2:rgba(20,19,23,.16);
-  --grid:rgba(20,19,23,.045); --shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 24px 60px -24px rgba(40,30,20,.22);
-  --open:#2FDC73; --social:#4F8DFF; --focus:#FF4B5C;
-  --active:var(--open);
-  --sans:"Geist","SF Pro Display","Helvetica Neue",Arial,sans-serif;
-  --hand:"Caveat","Bradley Hand","Segoe Print",cursive;
+  --ink:#0B0B0C; --ink-2:#4A4A52; --ink-3:#6A6A72; --mute:#8C8C94; --line:#EDEDF0; --soft:#F6F6F8;
+  --accent:#3FB874; --tint:#E6F4EC; --text:#1E7A47; --glow:rgba(63,184,116,.45);
+  --display:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+  --sans:"Manrope","Helvetica Neue",Arial,sans-serif;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#0A090C; --bg-2:#111015; --panel:rgba(24,22,29,.66); --panel-solid:#141218; --photo:#1A181E;
-    --ink:#F3F1EE; --ink-2:#ACA8B3; --ink-3:#6F6B76; --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.14);
-    --grid:rgba(255,255,255,.03); --shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 30px 80px -30px rgba(0,0,0,.85);
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#0A090C; --bg-2:#111015; --panel:rgba(24,22,29,.66); --panel-solid:#141218; --photo:#1A181E;
-  --ink:#F3F1EE; --ink-2:#ACA8B3; --ink-3:#6F6B76; --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.14);
-  --grid:rgba(255,255,255,.03); --shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 30px 80px -30px rgba(0,0,0,.85);
-}
-
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background:#fff;color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
-:focus-visible{outline:2px solid var(--active);outline-offset:3px;border-radius:8px}
-.wrap{width:min(1200px,100% - 40px);margin-inline:auto}
-.hand{font-family:var(--hand);font-weight:500;color:var(--ink-2);line-height:1.05}
-
-.ambient{position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:
-    radial-gradient(760px 420px at 78% 60px, color-mix(in srgb,var(--active) 22%,transparent), transparent 70%),
-    linear-gradient(var(--grid) 1px,transparent 1px) 0 0/64px 64px,
-    linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/64px 64px;
-  mask-image:linear-gradient(#000 0,#000 700px,transparent 1100px);-webkit-mask-image:linear-gradient(#000 0,#000 700px,transparent 1100px);
-  transition:background 1s}
-
-/* Wordmark */
-.wm{display:inline-flex;align-items:baseline;font-weight:400;letter-spacing:.3em;font-size:15px;line-height:1}
-.wm .ur{font-weight:300;letter-spacing:.02em;margin-right:.08em;color:color-mix(in srgb,currentColor 60%,transparent)}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--text);outline-offset:3px;border-radius:8px}
+.wrap{width:min(1160px,100% - 64px);margin-inline:auto}
+.sr{position:absolute;left:-9999px}
+h1,h2,h3,.disp{font-family:var(--display);letter-spacing:-.04em}
+.soft{color:var(--mute);font-weight:600}
+.t{transition:background .5s,color .5s,border-color .5s,box-shadow .5s}
 
 /* Nav */
-.navbar{position:sticky;top:0;z-index:30;backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);background:color-mix(in srgb,var(--bg) 72%,transparent);border-bottom:1px solid var(--line)}
-nav{display:flex;align-items:center;justify-content:space-between;height:66px}
-.links{display:flex;gap:30px;list-style:none;font-size:14px;color:var(--ink-2)}
+.nav{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;height:66px;font-size:14px}
+.logo{font-family:var(--display);font-weight:700;letter-spacing:.28em;font-size:16px}
+.links{display:flex;gap:28px;color:var(--ink-2)}
 .links a:hover{color:var(--ink)}
-.nav-cta{display:flex;gap:8px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 18px;border-radius:10px;font:500 14px var(--sans);border:1px solid transparent;cursor:pointer;transition:transform .15s,box-shadow .25s;white-space:nowrap}
-.btn:active{transform:scale(.98)}
-.btn-primary{background:var(--ink);color:var(--bg);box-shadow:0 0 0 1px var(--ink),0 10px 28px -10px color-mix(in srgb,var(--active) 80%,transparent)}
-.btn-primary:hover{box-shadow:0 0 0 1px var(--ink),0 12px 36px -6px color-mix(in srgb,var(--active) 95%,transparent)}
-.btn-ghost{background:var(--panel);color:var(--ink);border-color:var(--line-2)}
-.btn-ghost:hover{border-color:var(--ink-3)}
-.btn-lg{height:48px;padding:0 24px;font-size:15px;border-radius:12px}
+.pill-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px;border-radius:999px;font-weight:600;border:0;cursor:pointer;font-size:15px}
+.pill-btn.dark{background:var(--ink);color:#fff}
+.pill-btn.line{border:1px solid var(--ink);background:#fff;color:var(--ink)}
 
 /* Hero */
-.hero{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:80px 0 40px}
-.tagline{font-size:12px;letter-spacing:.3em;color:var(--ink-2);text-transform:uppercase}
-.hero-wm{font-size:22px;margin-bottom:12px}
-h1{font-weight:500;font-size:clamp(44px,6vw,78px);line-height:1;letter-spacing:-.05em;margin-top:30px}
-h1 .soft{color:var(--ink-3);font-weight:300}
-.sub{max-width:470px;margin-top:22px;font-size:18px;color:var(--ink-2)}
-.hero-cta{display:flex;gap:10px;margin-top:32px;flex-wrap:wrap}
-.perks{display:flex;gap:28px;margin-top:44px;flex-wrap:wrap}
-.perk{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--ink-2);line-height:1.3}
-.perk span.ic{width:42px;height:42px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;flex:none;background:var(--panel)}
-.perk svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-
-.stage{position:relative}
-.photo-card{position:relative;border-radius:28px;overflow:hidden;background:var(--photo);border:1px solid var(--line);box-shadow:var(--shadow);aspect-ratio:372/450}
-.photo-card img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
-.photo-card::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 40% at 58% 52%, color-mix(in srgb,var(--active) 26%,transparent), transparent 70%);mix-blend-mode:soft-light;transition:background 1s}
-/* Light strip on the hero band picks up the current mode color */
+.hero{text-align:center;padding:80px 0 32px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:var(--tint);color:var(--text);font-weight:600;font-size:14px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;flex:none}
+h1{margin:22px auto 0;max-width:980px;font-weight:800;font-size:clamp(52px,7.6vw,108px);line-height:.95;letter-spacing:-.045em}
+.hl{background:var(--tint);color:var(--text);padding:0 .14em;border-radius:.2em}
+.lede{margin:24px auto 0;max-width:560px;font-size:20px;color:var(--ink-2)}
+.seg{display:inline-flex;gap:4px;margin-top:32px;padding:5px;border-radius:999px;background:#F3F3F5;flex-wrap:wrap;justify-content:center}
+.seg button{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 22px;border:0;border-radius:999px;background:transparent;color:var(--ink);font-weight:600;font-size:15px;cursor:pointer;transition:background .4s,box-shadow .4s}
+.seg button i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.seg button[aria-pressed="true"]{background:var(--c);font-weight:700;box-shadow:0 6px 18px var(--g)}
+.seg button[aria-pressed="true"] i{display:none}
+.stage{position:relative;margin-top:24px;border-radius:40px;background:var(--tint);overflow:hidden;padding:48px 32px;display:flex;justify-content:center}
+.stage .halo{position:absolute;left:50%;top:50%;width:560px;height:560px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,var(--glow),transparent)}
+.photo{position:relative;width:min(520px,100%);aspect-ratio:372/450;border-radius:28px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,.35)}
+.photo img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
 .strip{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.strip path{fill:none;stroke:var(--active);stroke-linecap:round;transition:stroke .8s}
-.strip-tint{mix-blend-mode:color}
-.strip-tint path{stroke-width:3.2}
-.strip-glow{mix-blend-mode:screen}
-.strip-glow path{stroke-width:2.6;opacity:.75;filter:blur(3px)}
-.strip-glow path.halo{stroke-width:9;opacity:.35;filter:blur(10px)}
-.note{position:absolute;font-size:26px;transform:rotate(-6deg)}
-.note svg{display:block;width:70px;height:50px;stroke:var(--ink-2);fill:none;stroke-width:1.6;stroke-linecap:round}
-.note-1{top:28px;right:-26px;text-align:right}
-.inset{position:absolute;left:-44px;bottom:48px;width:170px;border-radius:20px;overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow);background:var(--photo)}
-.inset img{width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center 40%}
-.note-2{left:-40px;bottom:-10px;transform:rotate(-4deg);font-size:24px}
-.mode-chip{position:absolute;right:20px;bottom:20px;display:flex;align-items:center;gap:10px;padding:10px 14px 10px 12px;border-radius:14px;background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--line-2);box-shadow:var(--shadow);font-size:13px}
-.mode-chip i{width:10px;height:10px;border-radius:50%;background:var(--active);box-shadow:0 0 12px var(--active);transition:background .6s,box-shadow .6s}
-.mode-chip b{font-weight:600}
-.mode-chip small{color:var(--ink-3);display:block;font-size:12px}
-
-/* Product window */
-.window{margin:96px auto 0;max-width:1080px;border-radius:22px;padding:8px;background:linear-gradient(180deg,var(--line-2),transparent 60%);position:relative}
-.win{border-radius:16px;background:var(--panel-solid);border:1px solid var(--line);overflow:hidden;box-shadow:var(--shadow)}
-.win-bar{display:flex;align-items:center;gap:14px;height:46px;padding:0 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-3)}
-.lights{display:flex;gap:6px}.lights i{width:10px;height:10px;border-radius:50%;background:var(--line-2)}
-.win-bar .live{margin-left:auto;display:flex;align-items:center;gap:7px;color:var(--ink-2)}
-.live i{width:7px;height:7px;border-radius:50%;background:var(--open);box-shadow:0 0 0 3px color-mix(in srgb,var(--open) 25%,transparent)}
-.venues{display:flex;gap:4px;padding:3px;border-radius:9px;background:var(--bg-2);border:1px solid var(--line)}
-.venues button{border:0;background:transparent;color:var(--ink-3);font:500 12px var(--sans);padding:4px 10px;border-radius:6px;cursor:pointer}
-.venues button[aria-pressed="true"]{background:var(--panel-solid);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.win-body{display:grid;grid-template-columns:260px 1fr;min-height:470px}
-.side{border-right:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:14px}
-.side h4{font-size:12px;font-weight:500;color:var(--ink-3);margin-top:6px}
-.venue{font-size:15px;font-weight:500}
-.venue small{display:block;font-weight:400;color:var(--ink-3);font-size:13px}
-.stat{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;font-size:14px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg-2)}
-.stat i{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c)}
-.stat b{font-weight:600;font-variant-numeric:tabular-nums}
-.bar{height:6px;border-radius:6px;background:var(--line);overflow:hidden;display:flex}
-.bar span{height:100%;transition:width .8s}
-.room{position:relative;overflow:hidden;background:
-  linear-gradient(var(--grid) 1px,transparent 1px) 0 0/28px 28px,
-  linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/28px 28px}
-.zone{position:absolute;border:1px dashed var(--line-2);border-radius:14px;font-size:11px;color:var(--ink-3);padding:6px 9px;transition:all .6s}
-.guest{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--c);transform:translate(-50%,-50%);box-shadow:0 0 12px var(--c);transition:left 2.4s cubic-bezier(.4,0,.2,1),top 2.4s cubic-bezier(.4,0,.2,1)}
-.guest.ping::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1.5px solid var(--c);animation:ping 2.4s ease-out infinite}
-@keyframes ping{from{transform:scale(.6);opacity:1}to{transform:scale(2.2);opacity:0}}
-.toast{position:absolute;right:18px;bottom:18px;display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--panel);backdrop-filter:blur(12px);border:1px solid var(--line-2);font-size:13px;box-shadow:var(--shadow)}
-.toast i{width:9px;height:9px;border-radius:50%;background:var(--open);flex:none}
-.toast span small{color:var(--ink-3);font-size:13px;display:block}
+.strip path{fill:none;stroke:var(--accent);stroke-linecap:round;transition:stroke .8s}
+.strip-tint{mix-blend-mode:color}.strip-tint path{stroke-width:3.2}
+.strip-glow{mix-blend-mode:screen}.strip-glow path{stroke-width:2.6;opacity:.75;filter:blur(3px)}
+.strip-glow path.halo2{stroke-width:9;opacity:.35;filter:blur(10px)}
+.chip{position:absolute;right:32px;bottom:32px;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:16px;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);text-align:left}
+.chip .dot{width:10px;height:10px;box-shadow:0 0 12px var(--accent)}
+.chip span span{color:var(--ink-2)}
+.ticker{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 28px;margin-top:40px;padding:18px 24px;border-radius:999px;border:1px solid var(--line);font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:.04em;text-transform:uppercase}
 
 /* Sections */
-section{padding:120px 0}
-.head{max-width:680px;margin:0 auto 60px;text-align:center}
-.kicker{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2);margin-bottom:16px}
-.kicker i{width:6px;height:6px;border-radius:50%;background:var(--active);transition:background .8s}
-h2{font-weight:500;font-size:clamp(34px,4.6vw,58px);line-height:1.03;letter-spacing:-.045em}
-h2 .soft{color:var(--ink-3);font-weight:300}
-.head p{margin-top:18px;color:var(--ink-2);font-size:18px}
+section{padding:72px 0}
+.h2{margin:0 auto;text-align:center;max-width:780px;font-weight:800;font-size:clamp(36px,4.8vw,64px);line-height:1}
+.sub{margin:18px auto 0;max-width:580px;color:var(--ink-2);font-size:19px;text-align:center}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px;margin-top:56px}
+
+/* Host room map */
+.window{margin-top:48px;border-radius:28px;border:1px solid var(--line);background:#fff;overflow:hidden;box-shadow:0 30px 80px -40px rgba(20,20,40,.25)}
+.win-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-height:52px;padding:8px 18px;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+.venues{display:flex;gap:4px;padding:3px;border-radius:999px;background:var(--soft)}
+.venues button{border:0;background:transparent;color:var(--ink-3);font-weight:600;font-size:13px;min-height:34px;padding:0 14px;border-radius:999px;cursor:pointer}
+.venues button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.live{margin-left:auto;display:flex;align-items:center;gap:7px;color:var(--ink-2)}
+.live i{width:7px;height:7px;border-radius:50%;background:#3FB874;box-shadow:0 0 0 3px rgba(63,184,116,.25)}
+.win-body{display:grid;grid-template-columns:260px 1fr;min-height:470px}
+.side{border-right:1px solid var(--line);padding:22px;display:flex;flex-direction:column;gap:12px}
+.side h4{font-size:12px;font-weight:600;color:var(--ink-3);margin-top:6px}
+.venue{font-weight:700}.venue small{display:block;font-weight:500;color:var(--ink-3);font-size:13px}
+.stat{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;font-size:14px;padding:10px 12px;border-radius:12px;background:var(--soft)}
+.stat i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.stat b{font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:6px;background:var(--line);overflow:hidden;display:flex}
+.bar span{height:100%;transition:width .8s}
+.room{position:relative;overflow:hidden;background:linear-gradient(rgba(20,20,40,.04) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,rgba(20,20,40,.04) 1px,transparent 1px) 0 0/28px 28px}
+.zone{position:absolute;border:1px dashed #D6D6DC;border-radius:16px;font-size:11px;color:var(--ink-3);padding:6px 9px;transition:all .6s}
+.guest{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--c);transform:translate(-50%,-50%);box-shadow:0 0 10px var(--c);transition:left 2.4s cubic-bezier(.4,0,.2,1),top 2.4s cubic-bezier(.4,0,.2,1)}
+.guest.ping::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1.5px solid var(--c);animation:ping 2.4s ease-out infinite}
+@keyframes ping{from{transform:scale(.6);opacity:1}to{transform:scale(2.2);opacity:0}}
+.toast{position:absolute;right:18px;bottom:18px;display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:14px;background:#fff;border:1px solid var(--line);font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.toast i{width:9px;height:9px;border-radius:50%;background:#3FB874;flex:none}
+.toast small{color:var(--ink-3);font-size:13px;display:block}
 
 /* Modes */
-.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.mode{position:relative;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:22px;border:1px solid var(--line);background:var(--panel);padding:10px 10px 26px;box-shadow:var(--shadow);overflow:hidden;transition:border-color .3s,transform .3s}
-.mode:hover{transform:translateY(-2px)}
-.mode[aria-pressed="true"]{border-color:color-mix(in srgb,var(--c) 70%,transparent);box-shadow:var(--shadow),0 0 0 4px color-mix(in srgb,var(--c) 14%,transparent)}
-.mode .pic{border-radius:14px;overflow:hidden;background:var(--photo)}
-.mode img{width:100%;aspect-ratio:267/148;object-fit:cover}
-.mode .txt{padding:20px 16px 0}
-.mode-top{display:flex;align-items:center;justify-content:space-between}
-.mode h3{font-size:24px;font-weight:500;letter-spacing:-.03em}
-.dot{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-2);padding:4px 10px;border-radius:999px;border:1px solid var(--line-2)}
-.dot i{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
-.mode p{color:var(--ink-2);margin-top:6px}
-.mode .tells{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;display:flex;justify-content:space-between;color:var(--ink-3)}
-.mode .tells b{color:var(--ink);font-weight:500}
-.press{text-align:center;margin-top:30px;font-size:28px}
+.mcard{border-radius:32px;padding:12px 12px 28px}
+.mcard img{width:100%;aspect-ratio:16/11;object-fit:cover;border-radius:22px}
+.mcard .txt{padding:22px 16px 0}
+.mcard .name{font-family:var(--display);font-weight:800;font-size:48px;line-height:1;letter-spacing:-.03em}
+.mcard p{margin-top:10px}
+.mcard .tells{margin-top:14px;font-weight:700}
 
-/* App: tap to connect */
-.app-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:stretch}
-.app-demo{border-radius:24px;border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);padding:26px;display:flex;flex-direction:column;gap:20px}
-.tap-stage{position:relative;height:150px;border-radius:18px;background:var(--bg-2);border:1px solid var(--line);overflow:hidden;
-  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
-.pill{position:absolute;top:50%;width:120px;height:46px;margin-top:-23px;border-radius:23px;background:#141317;border:3px solid #26252B;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
-.pill::before{content:"";position:absolute;inset:5px;border-radius:16px;border:2px solid var(--open);box-shadow:0 0 14px var(--open),inset 0 0 8px color-mix(in srgb,var(--open) 40%,transparent)}
-.pill::after{content:attr(data-who);position:absolute;top:calc(100% + 10px);left:0;right:0;text-align:center;font-size:12px;color:var(--ink-3)}
-.pill.a{left:12%}.pill.b{right:12%}
-.app-demo.tapped .pill.a{transform:translateX(calc(var(--gap,0px)))}
-.app-demo.tapped .pill.b{transform:translateX(calc(var(--gap,0px) * -1))}
-.spark{position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px;border-radius:50%;background:#fff;box-shadow:0 0 30px 12px var(--open);opacity:0;transform:scale(.3)}
-.app-demo.tapped .spark{animation:spark .9s .55s ease-out forwards}
-@keyframes spark{0%{opacity:0;transform:scale(.3)}30%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(2.4)}}
-.phones{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.phone{border-radius:20px;border:1px solid var(--line-2);background:var(--panel-solid);padding:16px;min-height:178px;display:flex;flex-direction:column;gap:10px}
-.phone-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-3)}
-.phone-top b{color:var(--ink);font-weight:600;font-size:13px}
-.phone-msg{font-size:14px;line-height:1.4;color:var(--ink-2);flex:1}
-.phone-msg strong{color:var(--ink);font-weight:500}
-.phone-actions{display:flex;gap:6px}
-.phone-actions button{flex:1;height:34px;border-radius:9px;font:500 13px var(--sans);cursor:pointer;border:1px solid var(--line-2);background:transparent;color:var(--ink)}
-.phone-actions .allow{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.phone-actions button:disabled{opacity:.35;cursor:default}
-.status{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line-2);width:fit-content}
-.status i{width:7px;height:7px;border-radius:50%;background:var(--c,var(--ink-3))}
-.contact{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;background:var(--bg-2);border:1px solid var(--line)}
-.contact .av{width:32px;height:32px}
-.contact small{display:block;color:var(--ink-3);font-size:12px}
-.demo-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.demo-bar p{font-size:13px;color:var(--ink-3)}
-.app-side{display:flex;flex-direction:column;gap:16px}
-.steps{list-style:none;border-radius:24px;border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);padding:10px 26px}
-.steps li{display:grid;grid-template-columns:34px 1fr;gap:14px;padding:18px 0}
-.steps li + li{border-top:1px solid var(--line)}
-.steps .n{width:30px;height:30px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;font-size:13px;font-weight:500}
-.steps b{display:block;font-weight:500;font-size:17px;letter-spacing:-.02em}
-.steps p{font-size:14px;color:var(--ink-2);margin-top:2px}
-.pulse-card{border-radius:24px;padding:26px;background:#0B0A0E;color:#F3F1EE;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;position:relative;overflow:hidden}
-.pulse-card h3{font-size:20px;font-weight:500;letter-spacing:-.03em}
-.pulse-card p{font-size:14px;color:rgba(243,241,238,.7);margin-top:6px}
-.pulse-pair{display:flex;flex-direction:column;gap:12px}
-.pulse-pair span{display:block;width:84px;height:30px;border-radius:15px;border:2px solid var(--open);background:#141317;animation:mutual 1.6s ease-in-out infinite}
-.pulse-pair span:nth-child(2){animation-delay:.2s}
-@keyframes mutual{0%,100%{box-shadow:0 0 6px var(--open);border-color:color-mix(in srgb,var(--open) 60%,transparent)}50%{box-shadow:0 0 26px 6px var(--open);border-color:var(--open)}}
+/* App demo */
+.app{display:flex;flex-wrap:wrap;gap:20px;margin-top:48px;align-items:stretch}
+.demo{flex:1.2 1 480px;min-width:0;border-radius:32px;background:var(--soft);padding:24px;display:flex;flex-direction:column;gap:18px}
+.tapstage{position:relative;height:280px;border-radius:22px;overflow:hidden;background:radial-gradient(80% 90% at 50% 35%,#2A2830,#121116)}
+.limb{position:absolute;top:66%;width:0;height:0;transition:left .8s cubic-bezier(.2,.8,.2,1)}
+.limb.l{left:calc(50% - min(180px,30%));transform:rotate(-28deg)}
+.limb.r{left:calc(50% + min(180px,30%));transform:scaleX(-1) rotate(-28deg)}
+.tapped .limb.l{left:calc(50% - 34px)}
+.tapped .limb.r{left:calc(50% + 34px)}
+.limb .fore{position:absolute;left:-440px;top:-35px;width:460px;height:70px;border-radius:35px}
+.limb .hand{position:absolute;left:16px;top:-40px;width:86px;height:80px;border-radius:30px 42px 42px 30px}
+.limb .knuckle{position:absolute;left:70px;top:-26px;width:22px;height:52px;border-radius:11px;background:rgba(0,0,0,.09)}
+.limb.l .fore{background:linear-gradient(180deg,#E0AA80,#BC7D55 70%,#A86C46)}
+.limb.l .hand{background:linear-gradient(180deg,#D9A077,#B27149)}
+.limb.r .fore{background:linear-gradient(180deg,#9E6A49,#7A4C31 70%,#69402A)}
+.limb.r .hand{background:linear-gradient(180deg,#946140,#6E452C)}
+.limb .strap{position:absolute;left:-24px;top:-46px;width:40px;height:92px;border-radius:13px;background:linear-gradient(90deg,#2A2930,#141317)}
+.limb .lglow{position:absolute;left:-44px;top:-54px;width:80px;height:108px;border-radius:40px;background:var(--glow);filter:blur(14px);transition:background .4s}
+.limb .face{position:absolute;left:-22px;top:-37px;width:36px;height:74px;border-radius:18px;padding:4px;background:linear-gradient(90deg,#4A4951,#2B2A30)}
+.limb .ring{width:100%;height:100%;border-radius:14px;background:#07060A;border:2px solid var(--accent);box-shadow:0 0 10px var(--glow),inset 0 0 6px var(--glow);transition:border-color .4s}
+.asking .limb .lglow{background:rgba(255,255,255,.7)}
+.asking .limb .ring{border-color:#fff;animation:sgWhite 1.2s ease-in-out infinite}
+.declined .limb .lglow{background:rgba(106,106,114,.25)}
+.declined .limb .ring{border-color:#6A6A72;box-shadow:none}
+@keyframes sgWhite{0%,100%{border-color:rgba(255,255,255,.55);box-shadow:0 0 6px 1px rgba(255,255,255,.45),inset 0 0 4px rgba(255,255,255,.35)}50%{border-color:#fff;box-shadow:0 0 24px 7px rgba(255,255,255,.95),inset 0 0 10px rgba(255,255,255,.8)}}
+.spark{position:absolute;left:50%;top:60%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#fff;box-shadow:0 0 30px 14px rgba(255,255,255,.8);opacity:0}
+.tapped .spark{animation:sgSpark .9s .6s ease-out forwards}
+@keyframes sgSpark{0%{opacity:0;transform:scale(.3)}35%{opacity:1;transform:scale(1.3)}100%{opacity:0;transform:scale(2.4)}}
+.bubble{position:absolute;left:50%;top:18px;transform:translateX(-50%);display:none;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:#fff;color:var(--ink);font-weight:700;font-size:14px;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:sgPop .35s ease-out}
+.bubble.show{display:inline-flex}
+.bubble i{width:8px;height:8px;border-radius:50%;background:var(--b,#C8C8CE)}
+@keyframes sgPop{0%{opacity:0;transform:translateX(-50%) translateY(8px) scale(.9)}100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+.who{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:space-between;padding:0 18px;font-size:13px;color:#B8B8C0}
+.phones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.phone{border-radius:22px;background:#fff;border:1px solid #E4E4E8;padding:16px;min-height:186px;display:flex;flex-direction:column;gap:10px}
+.phone-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-3)}
+.phone-top b{color:var(--ink);font-size:14px}
+.phone p{font-size:15px;color:var(--ink-2)}
+.phone p.grow{flex:1}
+.phone p b{color:var(--ink)}
+.acts{display:flex;gap:6px}
+.acts button{flex:1;min-height:44px;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;border:1px solid #D6D6DC;background:#fff;color:var(--ink)}
+.acts button.allow{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tag{align-self:flex-start;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700}
+.contact{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:var(--soft);font-weight:600;font-size:15px}
+.contact i{width:34px;height:34px;border-radius:50%;flex:none}
+.contact small{display:block;font-weight:500;font-size:13px;color:var(--ink-3)}
+.demo-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.demo-bar p{font-size:14px;color:var(--ink-3)}
+.demo-bar .pill-btn{box-shadow:0 8px 22px var(--glow)}
+.steps-side{flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:20px}
+.steps{border-radius:32px;border:1px solid var(--line);padding:8px 28px;list-style:none}
+.steps li{display:flex;gap:16px;padding:20px 0}
+.steps li+li{border-top:1px solid var(--line)}
+.steps .n{font-family:var(--display);font-weight:800;font-size:26px;color:var(--text);line-height:1.2}
+.steps b{font-weight:700}.steps p{margin-top:4px;font-size:15px;color:var(--ink-2)}
+.mutual{border-radius:32px;background:#0F0F12;color:#fff;padding:28px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.mutual .pair{display:flex;flex-direction:column;gap:10px}
+.mutual .pair span{display:block;width:78px;height:26px;border-radius:13px;border:2px solid var(--accent);box-shadow:0 0 22px var(--glow);animation:sgPulse 1.6s ease-in-out infinite}
+.mutual .pair span+span{animation-delay:.2s}
+@keyframes sgPulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+.mutual b{font-family:var(--display);font-size:22px}
+.mutual p{margin-top:6px;color:#C8C8CE;font-size:15px}
 
-/* Gallery */
-.gallery{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:16px;align-items:stretch}
-.shot{position:relative;border-radius:24px;overflow:hidden;min-height:420px;background:#111}
-.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.shot::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.72))}
-.shot .cap{position:absolute;left:22px;right:22px;bottom:20px;z-index:1;color:#fff}
-.shot .cap b{display:block;font-size:22px;font-weight:500;letter-spacing:-.03em}
-.shot .cap span{font-size:14px;opacity:.75}
-.shot .tag{position:absolute;top:18px;left:18px;z-index:1;display:flex;align-items:center;gap:7px;font-size:12px;color:#fff;padding:5px 11px;border-radius:999px;background:rgba(0,0,0,.35);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18)}
-.shot .tag i{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
-.scenes{display:grid;grid-template-columns:repeat(4,1fr);margin-top:40px;border-top:1px solid var(--line)}
-.scene{padding:26px 24px 0 0}
-.scene + .scene{padding-left:24px;border-left:1px solid var(--line)}
-.scene b{font-weight:500;font-size:18px;letter-spacing:-.02em}
-.scene p{font-size:14px;color:var(--ink-2);margin-top:4px}
+/* Where to wear */
+.shot{position:relative}
+.shot img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:28px}
+.shot .lab{position:absolute;top:16px;left:16px;padding:6px 12px;border-radius:999px;font-weight:700;font-size:13px}
+.shot b{display:block;margin:16px 4px 0;font-family:var(--display);font-size:22px}
+.shot p{margin:2px 4px 0;color:var(--ink-2);font-size:15px}
 
-/* Colorways */
-.finish{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
-.finish-photo{border-radius:24px;overflow:hidden;background:var(--photo);border:1px solid var(--line);box-shadow:var(--shadow);min-height:300px;position:relative}
-.finish-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.04)}
-.finish-panel{border-radius:24px;border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);padding:34px;display:flex;flex-direction:column}
-.finish-panel h3{font-size:30px;font-weight:500;letter-spacing:-.04em;line-height:1.1}
-.finish-panel > p{color:var(--ink-2);margin-top:10px}
-.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:28px}
-.sw{font:inherit;color:inherit;background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;text-align:left;transition:border-color .2s}
+/* Finishes */
+.fin{display:flex;flex-wrap:wrap;gap:20px;align-items:stretch}
+.fin-stage{--strap:#26252A;--back:#18171C;--bezel:#34333A;--fbg:#ECEAE6;flex:1.1 1 440px;min-width:0;position:relative;min-height:520px;border-radius:36px;overflow:hidden;background:radial-gradient(70% 60% at 50% 45%,var(--tint),var(--fbg));transition:background .6s}
+.fin-label{position:absolute;left:20px;top:20px;z-index:2;display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.85);font-size:13px;font-weight:700}
+.fin-label i{width:12px;height:12px;border-radius:50%;background:var(--strap);box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.band{position:absolute;left:50%;top:50%;width:0;height:0;transform:rotate(-9deg)}
+.band>div{position:absolute}
+.b-shadow{left:50%;bottom:44px;width:260px;height:26px;margin-left:-110px;border-radius:50%;background:rgba(0,0,0,.22);filter:blur(14px);position:absolute}
+.b-back{left:-40px;top:-205px;width:210px;height:410px;border:40px solid var(--back);border-radius:105px;transition:border-color .5s}
+.b-front{left:-48px;top:-225px;width:96px;height:450px;border-radius:48px;background:linear-gradient(90deg,rgba(255,255,255,.28),rgba(255,255,255,.04) 30%,rgba(0,0,0,0) 70%,rgba(0,0,0,.22)),var(--strap);transition:background-color .5s}
+.b-keeper{left:-51px;top:-170px;width:102px;height:20px;border-radius:8px;background:linear-gradient(90deg,rgba(255,255,255,.22),rgba(0,0,0,.12)),var(--strap)}
+.b-hole{left:-5px;width:10px;height:7px;border-radius:50%;background:rgba(0,0,0,.3)}
+.b-glow{left:-78px;top:-150px;width:156px;height:300px;border-radius:78px;background:var(--glow);filter:blur(26px);transition:background .6s}
+.b-cap{left:-54px;top:-122px;width:108px;height:244px;border-radius:54px;padding:8px;background:linear-gradient(90deg,rgba(255,255,255,.35),rgba(255,255,255,0) 35%,rgba(0,0,0,.25)),var(--bezel);box-shadow:0 16px 30px rgba(0,0,0,.28)}
+.b-screen{position:relative;width:100%;height:100%;border-radius:46px;background:linear-gradient(140deg,#22212A,#08070B 55%,#030304);border:2.5px solid var(--accent);box-shadow:0 0 18px 2px var(--glow),inset 0 0 14px var(--glow);transition:border-color .6s,box-shadow .6s}
+.b-read{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(90deg);text-align:center;white-space:nowrap}
+.b-time{font-weight:400;font-size:40px;line-height:1;color:#F6F2EC;letter-spacing:.01em}
+.b-mode{margin-top:6px;font-size:10px;letter-spacing:.4em;font-weight:700;color:var(--accent)}
+.b-btn{left:52px;top:-30px;width:8px;height:60px;border-radius:4px;background:var(--bezel);box-shadow:inset -2px 0 3px rgba(0,0,0,.3)}
+.fin-panel{flex:1 1 340px;min-width:0;border-radius:36px;border:1px solid var(--line);padding:36px;display:flex;flex-direction:column}
+.fin-panel h2{font-weight:800;font-size:clamp(30px,3.6vw,46px);line-height:1.02;letter-spacing:-.035em}
+.fin-panel>p{margin-top:14px;color:var(--ink-2)}
+.swatches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:28px}
+.sw{display:flex;align-items:center;gap:12px;min-height:60px;padding:10px 14px;border-radius:16px;border:2px solid var(--line);background:#fff;color:var(--ink);font-weight:600;font-size:15px;text-align:left;cursor:pointer;transition:border-color .2s}
 .sw[aria-pressed="true"]{border-color:var(--ink)}
-.sw i{display:block;height:36px;border-radius:10px;background:var(--s);box-shadow:inset 0 -6px 10px rgba(0,0,0,.12),inset 0 4px 8px rgba(255,255,255,.35),0 0 0 1px rgba(0,0,0,.06)}
-.sw b{display:block;margin-top:10px;font-size:14px;font-weight:500}
-.sw small{font-size:12px;color:var(--ink-3)}
-.finish-note{margin-top:auto;padding-top:26px;font-size:26px}
-
-/* Bento */
-.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
-.tile{border-radius:20px;border:1px solid var(--line);background:var(--panel);padding:28px;box-shadow:var(--shadow);overflow:hidden;position:relative}
-.tile h3{font-size:20px;font-weight:500;letter-spacing:-.03em}
-.tile p{color:var(--ink-2);margin-top:6px;font-size:15px;max-width:38ch}
-.t-a{grid-column:span 3}.t-b{grid-column:span 3}.t-c,.t-d,.t-e{grid-column:span 2}
-.big{font-size:64px;font-weight:500;letter-spacing:-.06em;line-height:1;margin-top:22px;font-variant-numeric:tabular-nums}
-.big small{font-size:16px;color:var(--ink-3);letter-spacing:0;font-weight:400;margin-left:6px}
-.dial{display:flex;align-items:center;gap:22px;margin-top:22px}
-.knob{width:88px;height:88px;border-radius:50%;background:conic-gradient(var(--open) 0 33%,var(--social) 0 66%,var(--focus) 0);padding:6px;flex:none;transform:rotate(var(--rot,0deg));transition:transform .7s cubic-bezier(.2,.8,.2,1)}
-.knob::after{content:"";display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#3a3840,#0e0d11);box-shadow:inset 0 2px 6px rgba(255,255,255,.1)}
-.dial ul{list-style:none;font-size:14px;display:grid;gap:4px;color:var(--ink-3)}
-.dial li.on{color:var(--ink);font-weight:500}
-.spark{margin-top:18px;height:70px;width:100%}
-.spark path{stroke:var(--active);transition:stroke .8s}
-.mini{margin-top:18px;display:grid;gap:8px;font-size:14px}
-.mini div{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg-2)}
-.mini i{width:8px;height:8px;border-radius:50%;background:var(--c)}
-.mini span{margin-left:auto;color:var(--ink-3);font-size:12px}
-
-/* Quotes */
-.quotes{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:16px}
-.quote{border-radius:20px;border:1px solid var(--line);background:var(--panel);padding:28px;display:flex;flex-direction:column;justify-content:space-between;gap:30px}
-.quote q{quotes:none;font-size:17px;line-height:1.5}
-.quote.big-q q{font-size:28px;line-height:1.2;letter-spacing:-.03em;font-weight:400}
-.who{display:flex;align-items:center;gap:12px;font-size:14px}
-.av{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 30% 30%,color-mix(in srgb,var(--c) 70%,#fff),var(--c));flex:none}
-.who small{display:block;color:var(--ink-3)}
+.sw i{width:30px;height:30px;border-radius:50%;background:var(--s);box-shadow:inset 0 -3px 6px rgba(0,0,0,.18),0 0 0 1px rgba(0,0,0,.1);flex:none}
+.sw small{display:block;font-weight:500;font-size:13px;color:var(--ink-3)}
+.fin-note{margin-top:auto;padding-top:24px;font-family:var(--display);font-weight:600;font-size:20px;color:var(--text)}
 
 /* Pricing */
-.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.plan{border-radius:20px;border:1px solid var(--line);background:var(--panel);padding:30px;display:flex;flex-direction:column;position:relative}
-.plan.featured{background:var(--ink);color:var(--bg);border-color:var(--ink);box-shadow:0 30px 80px -30px color-mix(in srgb,var(--active) 70%,transparent)}
-.plan.featured .muted,.plan.featured li{color:color-mix(in srgb,var(--bg) 70%,transparent)}
-.plan h3{font-size:17px;font-weight:500}
-.price{font-size:52px;font-weight:500;letter-spacing:-.05em;margin-top:18px;line-height:1}
-.price small{font-size:15px;font-weight:400;letter-spacing:0;opacity:.6}
-.muted{color:var(--ink-2);font-size:14px;margin-top:10px}
-.plan ul{list-style:none;margin:26px 0 30px;display:grid;gap:10px;font-size:14px;color:var(--ink-2)}
-.plan li{display:flex;gap:10px}
-.plan li::before{content:"";flex:none;width:16px;height:16px;margin-top:3px;border-radius:50%;background:radial-gradient(circle,var(--active) 0 3px,transparent 3.5px),color-mix(in srgb,var(--active) 20%,transparent);transition:background .8s}
-.plan .btn{margin-top:auto;width:100%}
-.plan.featured .btn-primary{background:var(--bg);color:var(--ink);box-shadow:none}
-.badge{position:absolute;top:22px;right:22px;font-size:12px;padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,var(--open),var(--social));color:#0A090C;font-weight:500}
+.plan{border-radius:32px;background:var(--soft);padding:36px 30px;display:flex;flex-direction:column;gap:8px}
+.plan .price{font-family:var(--display);font-weight:800;font-size:56px;line-height:1;letter-spacing:-.03em}
+.plan>span{color:var(--ink-2)}
+.plan a{margin-top:auto;text-align:center;padding:13px;border-radius:999px;font-weight:600}
+.plan .gap{flex:1;min-height:12px}
+.plan.feat{background:var(--tint);box-shadow:inset 0 0 0 2px var(--accent)}
+.plan.feat b{color:var(--text)}
 
 /* FAQ */
-.faq{max-width:760px;margin:0 auto}
+.faq{max-width:760px;margin:48px auto 0}
 details{border-bottom:1px solid var(--line);padding:22px 0}
-summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:18px;font-weight:500;letter-spacing:-.02em}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:18px;font-weight:700}
 summary::-webkit-details-marker{display:none}
-summary::after{content:"+";font-weight:300;font-size:26px;color:var(--ink-3);transition:transform .25s}
+summary::after{content:"+";font-weight:400;font-size:26px;color:var(--mute);transition:transform .25s}
 details[open] summary::after{transform:rotate(45deg)}
-details p{color:var(--ink-2);margin-top:10px;max-width:62ch}
+details p{color:var(--ink-2);margin-top:10px}
 
 /* CTA */
-.cta{position:relative;border-radius:28px;overflow:hidden;padding:96px 40px;text-align:center;background:#0B0A0E;color:#F3F1EE}
-.cta::before{content:"";position:absolute;left:50%;bottom:-360px;width:900px;height:520px;transform:translateX(-50%);border-radius:50%;background:conic-gradient(from 180deg,var(--open),var(--social),var(--focus),var(--open));filter:blur(80px);opacity:.55}
-.cta > *{position:relative}
-.cta .kicker{color:rgba(243,241,238,.7)}
-.cta .wm{font-size:13px;opacity:.7;margin-bottom:26px}
-.cta h2{max-width:15ch;margin:0 auto}
-.cta p{color:rgba(243,241,238,.7);margin:18px auto 0;max-width:460px}
-.cta .hand{color:rgba(243,241,238,.85);font-size:30px;margin-top:10px;transform:rotate(-3deg)}
-form{display:flex;gap:8px;max-width:440px;margin:34px auto 0;padding:6px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);backdrop-filter:blur(10px)}
-form:focus-within{border-color:var(--active)}
-input{flex:1;min-width:0;border:0;background:transparent;color:#F3F1EE;font:400 15px var(--sans);padding:0 12px;outline:none}
-input::placeholder{color:rgba(243,241,238,.45)}
-.cta .btn-primary{background:#F3F1EE;color:#0B0A0E;box-shadow:none}
-.msg{min-height:1.4em;margin-top:14px;font-size:14px;font-weight:500}
+.cta{position:relative;border-radius:40px;overflow:hidden;padding:112px 32px 120px;text-align:center;
+  background:radial-gradient(45% 55% at 82% 12%,rgba(255,244,226,.95),rgba(255,244,226,0) 70%),radial-gradient(50% 60% at 10% 85%,rgba(255,214,196,.8),rgba(255,214,196,0) 70%),linear-gradient(165deg,#B9CFF3 0%,#D7E3F8 32%,#F3E6E4 62%,#F9D2BC 100%)}
+.cta .fx{position:absolute;pointer-events:none}
+.streak1{left:-10%;top:30%;width:120%;height:70px;transform:rotate(-14deg);background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,250,240,.85) 45%,rgba(255,214,170,.6) 60%,rgba(255,255,255,0));filter:blur(18px)}
+.streak2{left:-10%;top:62%;width:120%;height:40px;transform:rotate(9deg);background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,236,214,.75) 35%,rgba(255,255,255,0) 75%);filter:blur(14px)}
+.streak3{right:-6%;top:-8%;width:60%;height:22px;transform:rotate(32deg);background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.9),rgba(255,255,255,0));filter:blur(10px)}
+.ring1{left:50%;top:46%;width:min(460px,90vw);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:3px solid rgba(255,255,255,.95);box-shadow:0 0 28px 4px rgba(255,255,255,.85),inset 0 0 28px 4px rgba(255,255,255,.6),0 0 90px 10px var(--glow);transition:box-shadow .6s}
+.ring2{left:50%;top:46%;width:min(560px,110vw);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(255,255,255,.45)}
+.refl{left:50%;bottom:-60px;width:120%;height:180px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.75),rgba(255,226,206,.35) 60%,rgba(255,255,255,0))}
+.refl-ring{left:50%;bottom:18px;width:min(420px,80vw);height:60px;transform:translateX(-50%);border-radius:50%;border:2px solid rgba(255,255,255,.55);filter:blur(2px)}
+.spk{border-radius:50%;background:#fff}
+.cta-in{position:relative}
+.cta .kick{font-weight:700;font-size:13px;letter-spacing:.32em;color:#3A3A48}
+.cta h2{margin-top:18px;font-weight:800;font-size:clamp(44px,6vw,84px);line-height:.95;letter-spacing:-.045em}
+.cta .cp{margin:18px auto 0;max-width:460px;color:#33334A;font-size:18px}
+.join{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:480px;margin:32px auto 0;padding:6px;border-radius:999px;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.9);box-shadow:0 12px 40px rgba(120,110,160,.25);backdrop-filter:blur(12px)}
+.join input{flex:1 1 220px;min-width:0;min-height:50px;padding:0 20px;border-radius:999px;border:0;background:transparent;color:var(--ink);font:500 16px var(--sans);outline:none}
+.join button{min-height:50px;padding:0 26px;border:0;border-radius:999px;background:var(--ink);color:#fff;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 8px 24px var(--glow)}
+.msg{min-height:1.5em;margin-top:14px;font-weight:600;font-size:15px;color:#2A2A3A}
 
-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding:48px 0 60px;border-top:1px solid var(--line);margin-top:100px;font-size:14px;color:var(--ink-3)}
-footer .fl{display:flex;gap:24px}
+footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:16px 0 48px;font-size:13px;color:var(--ink-3)}
 
-@media (max-width:980px){
-  .hero{grid-template-columns:1fr;gap:70px;padding-top:50px}
-  .stage{max-width:460px;margin:0 auto;width:100%}
-  .inset{left:-10px;width:130px}
-  .note-1{right:0;top:-54px}
-  .note-2{left:-4px}
+@media (max-width:900px){
   .links{display:none}
   .win-body{grid-template-columns:1fr}
   .side{border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
   .side .venue,.side h4,.side .bar{grid-column:1/-1}
   .room{min-height:400px}
-  .modes,.plans,.quotes,.gallery,.finish,.app-grid{grid-template-columns:1fr}
-  .shot{min-height:340px}
-  .scenes{grid-template-columns:1fr 1fr}
-  .scene,.scene + .scene{padding:20px 16px 20px 0;border-left:0;border-bottom:1px solid var(--line)}
-  .bento{grid-template-columns:1fr 1fr}
-  .t-a,.t-b{grid-column:span 2}.t-c,.t-d,.t-e{grid-column:span 1}
-  section{padding:90px 0}
+  .ticker{border-radius:24px}
 }
 @media (max-width:600px){
-  .nav-cta .btn-ghost{display:none}
+  .wrap{width:calc(100% - 32px)}
+  .hero{padding-top:48px}
   .side{grid-template-columns:1fr}
-  .bento{grid-template-columns:1fr}.t-a,.t-b,.t-c,.t-d,.t-e{grid-column:span 1}
-  .swatches{grid-template-columns:1fr 1fr}
+  .stage{padding:28px 16px;border-radius:28px}
+  .chip{right:16px;bottom:16px;left:16px}
+  .demo{padding:16px}
+  .phones{grid-template-columns:1fr}
   .toast{left:12px;right:12px}
-  .perks{gap:18px}
-  .pill{width:84px}.pill.a{left:8%}.pill.b{right:8%}
-  .phone{padding:12px}
-  .pulse-card{grid-template-columns:1fr}
+  .nav .pill-btn{padding:0 16px}
+  .join{border-radius:28px}
+  .join button{width:100%}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
-<div class="ambient"></div>
 
-<div class="navbar">
+<div class="nav">
   <div class="wrap">
-    <nav>
-      <a class="wm" href="#top" aria-label="SYGNAL home">SYGNAL</a>
-      <ul class="links">
-        <li><a href="#modes">Modes</a></li>
-        <li><a href="#app">App</a></li>
-        <li><a href="#everywhere">Where to wear</a></li>
-        <li><a href="#finishes">Finishes</a></li>
-        <li><a href="#pricing">Pricing</a></li>
-        <li><a href="#faq">FAQ</a></li>
-      </ul>
-      <div class="nav-cta">
-        <a class="btn btn-ghost" href="#pricing">Host an event</a>
-        <a class="btn btn-primary" href="#join">Get early access</a>
-      </div>
+    <a class="logo" href="#top" aria-label="SYGNAL home">SYGNAL</a>
+    <nav class="links" aria-label="Main">
+      <a href="#modes">Modes</a><a href="#app">App</a><a href="#hosts">Hosts</a><a href="#finishes">Finishes</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
     </nav>
+    <a class="pill-btn dark" href="#join">Get early access</a>
   </div>
 </div>
 
 <main id="top">
-  <div class="wrap">
-    <header class="hero">
-      <div>
-        <div class="wm hero-wm" aria-hidden="true">SYGNAL</div>
-        <p class="tagline">Simple signals. Real connections.</p>
-        <h1><span class="soft">Say nothing.</span> SYGNAL everything.</h1>
-        <p class="sub">SYGNAL is a minimal digital watch with a light ring that glows green, blue, or red, so everyone can see whether you want to meet someone, just be social, or be left alone.</p>
-        <div class="hero-cta">
-          <a class="btn btn-primary btn-lg" href="#join">Get early access</a>
-          <a class="btn btn-ghost btn-lg" href="#modes">See the modes</a>
+  <div class="wrap hero">
+    <p class="badge t"><span class="dot t"></span><span data-b="label">Open</span> · <span data-b="tells">Come say hi</span></p>
+    <h1><span class="soft">Say nothing.</span> <span class="hl t">SYGNAL</span> everything.</h1>
+    <p class="lede">A minimal digital watch with a light ring that glows green, blue, or red, so the room knows whether you want to meet someone, be social, or be left alone.</p>
+    <div class="seg" role="group" aria-label="Choose a mode">
+      <button type="button" data-mode="open" aria-pressed="true" style="--c:#3FB874;--g:rgba(63,184,116,.45)"><i></i>Open</button>
+      <button type="button" data-mode="social" aria-pressed="false" style="--c:#5B8DEF;--g:rgba(91,141,239,.45)"><i></i>Social</button>
+      <button type="button" data-mode="focus" aria-pressed="false" style="--c:#E5606C;--g:rgba(229,96,108,.42)"><i></i>Focus</button>
+    </div>
+    <div class="stage t">
+      <div class="halo"></div>
+      <div class="photo">
+        <img src="hero.jpg" alt="Black SYGNAL band with a digital time display and glowing light strip">
+        <svg class="strip strip-tint" viewBox="0 0 100 120.97" preserveAspectRatio="none" aria-hidden="true"><path d="M77 30.24 C76.33 30.64 74.00 31.65 73 32.66 C72.00 33.67 71.50 35.08 71 36.29 C70.50 37.50 70.33 38.71 70 39.92 C69.67 41.13 69.33 42.34 69 43.55 C68.67 44.76 68.33 45.97 68 47.18 C67.67 48.39 67.33 49.60 67 50.81 C66.67 52.02 66.33 53.23 66 54.44 C65.67 55.65 65.33 56.85 65 58.06 C64.67 59.27 64.33 60.48 64 61.69 C63.67 62.90 63.33 64.11 63 65.32 C62.67 66.53 62.33 67.74 62 68.95 C61.67 70.16 61.40 71.37 61 72.58 C60.60 73.79 60.02 75.00 59.6 76.21 C59.18 77.42 58.83 78.63 58.5 79.84 C58.17 81.05 57.75 82.26 57.6 83.47 C57.45 84.68 57.40 85.89 57.6 87.1 C57.80 88.31 58.32 89.72 58.8 90.73 C59.28 91.74 60.22 92.75 60.5 93.15"/></svg>
+        <svg class="strip strip-glow" viewBox="0 0 100 120.97" preserveAspectRatio="none" aria-hidden="true"><path class="halo2" d="M77 30.24 C76.33 30.64 74.00 31.65 73 32.66 C72.00 33.67 71.50 35.08 71 36.29 C70.50 37.50 70.33 38.71 70 39.92 C69.67 41.13 69.33 42.34 69 43.55 C68.67 44.76 68.33 45.97 68 47.18 C67.67 48.39 67.33 49.60 67 50.81 C66.67 52.02 66.33 53.23 66 54.44 C65.67 55.65 65.33 56.85 65 58.06 C64.67 59.27 64.33 60.48 64 61.69 C63.67 62.90 63.33 64.11 63 65.32 C62.67 66.53 62.33 67.74 62 68.95 C61.67 70.16 61.40 71.37 61 72.58 C60.60 73.79 60.02 75.00 59.6 76.21 C59.18 77.42 58.83 78.63 58.5 79.84 C58.17 81.05 57.75 82.26 57.6 83.47 C57.45 84.68 57.40 85.89 57.6 87.1 C57.80 88.31 58.32 89.72 58.8 90.73 C59.28 91.74 60.22 92.75 60.5 93.15"/><path d="M77 30.24 C76.33 30.64 74.00 31.65 73 32.66 C72.00 33.67 71.50 35.08 71 36.29 C70.50 37.50 70.33 38.71 70 39.92 C69.67 41.13 69.33 42.34 69 43.55 C68.67 44.76 68.33 45.97 68 47.18 C67.67 48.39 67.33 49.60 67 50.81 C66.67 52.02 66.33 53.23 66 54.44 C65.67 55.65 65.33 56.85 65 58.06 C64.67 59.27 64.33 60.48 64 61.69 C63.67 62.90 63.33 64.11 63 65.32 C62.67 66.53 62.33 67.74 62 68.95 C61.67 70.16 61.40 71.37 61 72.58 C60.60 73.79 60.02 75.00 59.6 76.21 C59.18 77.42 58.83 78.63 58.5 79.84 C58.17 81.05 57.75 82.26 57.6 83.47 C57.45 84.68 57.40 85.89 57.6 87.1 C57.80 88.31 58.32 89.72 58.8 90.73 C59.28 91.74 60.22 92.75 60.5 93.15"/></svg>
+      </div>
+      <div class="chip" aria-live="polite"><span class="dot"></span><span><b data-b="label">Open</b> <span>· <span data-b="desc">Open to conversation</span></span></span></div>
+    </div>
+    <div class="ticker">
+      <span style="color:#1E7A47">Green = come say hi</span><span style="color:#C6C6CC" aria-hidden="true">/</span>
+      <span style="color:#2F5FC4">Blue = friendly, not flirting</span><span style="color:#C6C6CC" aria-hidden="true">/</span>
+      <span style="color:#B83A47">Red = give me space</span>
+    </div>
+  </div>
+
+  <section id="modes">
+    <div class="wrap">
+      <h2 class="h2">One band. Three signals. <span class="soft">Read in a glance.</span></h2>
+      <p class="sub">Press the side button or rotate the band to switch, anytime.</p>
+      <div class="grid3">
+        <div class="mcard" style="background:#E6F4EC"><img src="m-open.jpg" alt="SYGNAL band glowing green"><div class="txt"><div class="name" style="color:#1E7A47">Open</div><p style="color:#2F3A33">Open to conversation and meeting new people.</p><p class="tells" style="color:#1E7A47">Come say hi</p></div></div>
+        <div class="mcard" style="background:#E8EFFC"><img src="m-social.jpg" alt="SYGNAL band glowing blue"><div class="txt"><div class="name" style="color:#2F5FC4">Social</div><p style="color:#2E3443">Down for a workout partner, a dance, or a friendly chat.</p><p class="tells" style="color:#2F5FC4">Friendly, not flirting</p></div></div>
+        <div class="mcard" style="background:#FBE9EB"><img src="m-focus.jpg" alt="SYGNAL band glowing red"><div class="txt"><div class="name" style="color:#B83A47">Focus</div><p style="color:#43302F">Prefer to be left alone right now.</p><p class="tells" style="color:#B83A47">Give me space</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="app">
+    <div class="wrap">
+      <h2 class="h2">Tap bands. <span class="soft">Both say yes.</span></h2>
+      <p class="sub">Hold your bracelets together to swap info in the SYGNAL app. Nothing is shared until each person allows it.</p>
+      <div class="app">
+        <div class="demo">
+          <div class="tapstage" id="tapstage" role="img" aria-label="Two people holding their SYGNAL watches face to face">
+            <div class="limb l"><div class="fore"></div><div class="hand"></div><div class="knuckle"></div></div>
+            <div class="limb r"><div class="fore"></div><div class="hand"></div><div class="knuckle"></div></div>
+            <div class="limb l"><div class="strap"></div><div class="lglow"></div><div class="face"><div class="ring"></div></div></div>
+            <div class="limb r"><div class="strap"></div><div class="lglow"></div><div class="face"><div class="ring"></div></div></div>
+            <div class="spark"></div>
+            <div class="bubble" id="bubble"><i></i><span></span></div>
+            <div class="who"><span>You</span><span>Maya</span></div>
+          </div>
+          <div class="phones">
+            <div class="phone" id="ph-you"></div>
+            <div class="phone" id="ph-maya"></div>
+          </div>
+          <div class="demo-bar">
+            <p id="hint" aria-live="polite">Try it: tap the bands together.</p>
+            <button class="pill-btn dark" id="tap" type="button">Tap bands together</button>
+          </div>
         </div>
-        <div class="perks">
-          <div class="perk"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="8.5" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M3 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M13 14.3c.9-.2 1.9-.3 3-.3 3 0 5 2 5 5"/></svg></span>Meet<br>new people</div>
-          <div class="perk"><span class="ic"><svg viewBox="0 0 24 24"><path d="M6 8v8M9 6v12M15 6v12M18 8v8M9 12h6M3 12h3M18 12h3"/></svg></span>Find<br>workout partners</div>
-          <div class="perk"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 4c4.9 0 8.5 3.1 8.5 7s-3.6 7-8.5 7c-1 0-2-.1-2.9-.4L4.5 20l1.2-3.6C4.3 15 3.5 13.1 3.5 11c0-3.9 3.6-7 8.5-7z"/></svg></span>Better<br>nights out</div>
+        <div class="steps-side">
+          <ol class="steps">
+            <li><span class="n t">1</span><div><b>Hold your bands together</b><p>A quick tap starts a connection request in the app.</p></div></li>
+            <li><span class="n t">2</span><div><b>Each person allows it</b><p>Your info only goes out when you approve it. You never get anything the other person didn't allow.</p></div></li>
+            <li><span class="n t">3</span><div><b>You're connected</b><p>Both say yes and your details land in each other's app.</p></div></li>
+          </ol>
+          <div class="mutual">
+            <div class="pair" aria-hidden="true"><span></span><span></span></div>
+            <div style="flex:1 1 200px"><b>When it's mutual, your band pulses.</b><p>If you're interested in someone and they're interested in you too, both bands pulse so you know it's real.</p></div>
+          </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="stage">
-        <div class="photo-card">
-          <img src="hero.jpg" alt="Black SYGNAL watch with a digital time display and glowing light strip">
-          <svg class="strip strip-tint" viewBox="0 0 100 120.97" preserveAspectRatio="none" aria-hidden="true"><path d="M77 30.24 C76.33 30.64 74.00 31.65 73 32.66 C72.00 33.67 71.50 35.08 71 36.29 C70.50 37.50 70.33 38.71 70 39.92 C69.67 41.13 69.33 42.34 69 43.55 C68.67 44.76 68.33 45.97 68 47.18 C67.67 48.39 67.33 49.60 67 50.81 C66.67 52.02 66.33 53.23 66 54.44 C65.67 55.65 65.33 56.85 65 58.06 C64.67 59.27 64.33 60.48 64 61.69 C63.67 62.90 63.33 64.11 63 65.32 C62.67 66.53 62.33 67.74 62 68.95 C61.67 70.16 61.40 71.37 61 72.58 C60.60 73.79 60.02 75.00 59.6 76.21 C59.18 77.42 58.83 78.63 58.5 79.84 C58.17 81.05 57.75 82.26 57.6 83.47 C57.45 84.68 57.40 85.89 57.6 87.1 C57.80 88.31 58.32 89.72 58.8 90.73 C59.28 91.74 60.22 92.75 60.5 93.15"/></svg>
-          <svg class="strip strip-glow" viewBox="0 0 100 120.97" preserveAspectRatio="none" aria-hidden="true"><path class="halo" d="M77 30.24 C76.33 30.64 74.00 31.65 73 32.66 C72.00 33.67 71.50 35.08 71 36.29 C70.50 37.50 70.33 38.71 70 39.92 C69.67 41.13 69.33 42.34 69 43.55 C68.67 44.76 68.33 45.97 68 47.18 C67.67 48.39 67.33 49.60 67 50.81 C66.67 52.02 66.33 53.23 66 54.44 C65.67 55.65 65.33 56.85 65 58.06 C64.67 59.27 64.33 60.48 64 61.69 C63.67 62.90 63.33 64.11 63 65.32 C62.67 66.53 62.33 67.74 62 68.95 C61.67 70.16 61.40 71.37 61 72.58 C60.60 73.79 60.02 75.00 59.6 76.21 C59.18 77.42 58.83 78.63 58.5 79.84 C58.17 81.05 57.75 82.26 57.6 83.47 C57.45 84.68 57.40 85.89 57.6 87.1 C57.80 88.31 58.32 89.72 58.8 90.73 C59.28 91.74 60.22 92.75 60.5 93.15"/><path d="M77 30.24 C76.33 30.64 74.00 31.65 73 32.66 C72.00 33.67 71.50 35.08 71 36.29 C70.50 37.50 70.33 38.71 70 39.92 C69.67 41.13 69.33 42.34 69 43.55 C68.67 44.76 68.33 45.97 68 47.18 C67.67 48.39 67.33 49.60 67 50.81 C66.67 52.02 66.33 53.23 66 54.44 C65.67 55.65 65.33 56.85 65 58.06 C64.67 59.27 64.33 60.48 64 61.69 C63.67 62.90 63.33 64.11 63 65.32 C62.67 66.53 62.33 67.74 62 68.95 C61.67 70.16 61.40 71.37 61 72.58 C60.60 73.79 60.02 75.00 59.6 76.21 C59.18 77.42 58.83 78.63 58.5 79.84 C58.17 81.05 57.75 82.26 57.6 83.47 C57.45 84.68 57.40 85.89 57.6 87.1 C57.80 88.31 58.32 89.72 58.8 90.73 C59.28 91.74 60.22 92.75 60.5 93.15"/></svg>
-          <div class="mode-chip" aria-live="polite"><i></i><span><b id="chip-name">Open</b><small id="chip-text">Open to conversation</small></span></div>
-        </div>
-        <div class="note note-1 hand" aria-hidden="true">Tells time.<br>Tells the room<br>how you feel.</div>
-        <div class="inset"><img src="detail.jpg" alt="Side button used to change modes"></div>
-        <div class="note note-2 hand" aria-hidden="true">Press or rotate to change modes</div>
-      </div>
-    </header>
-
-    <div class="window">
-      <div class="win">
+  <section id="hosts" style="padding-top:24px">
+    <div class="wrap">
+      <h2 class="h2">See the room. <span class="soft">Host better nights.</span></h2>
+      <p class="sub">Gyms, venues, and campus orgs get a live view of the signal mix, so you can time mixers and group classes.</p>
+      <div class="window">
         <div class="win-bar">
-          <div class="lights"><i></i><i></i><i></i></div>
-          <span>SYGNAL for Hosts</span>
+          <b style="color:var(--ink)">SYGNAL for Hosts</b>
           <div class="venues" role="group" aria-label="Choose a venue">
-            <button data-venue="rooftop" aria-pressed="true">Rooftop</button>
-            <button data-venue="gym" aria-pressed="false">Gym</button>
-            <button data-venue="campus" aria-pressed="false">Campus</button>
+            <button type="button" data-venue="rooftop" aria-pressed="true">Rooftop</button>
+            <button type="button" data-venue="gym" aria-pressed="false">Gym</button>
+            <button type="button" data-venue="campus" aria-pressed="false">Campus</button>
           </div>
           <span class="live"><i></i>Live</span>
         </div>
@@ -412,10 +376,10 @@ footer .fl{display:flex;gap:24px}
           <aside class="side">
             <div class="venue"><span id="v-name">Rooftop Social</span><small id="v-time">Friday, 10:40 pm</small></div>
             <h4>Signals in the room</h4>
-            <div class="stat" style="--c:var(--open)"><i></i><span>Open</span><b id="n-open">0</b></div>
-            <div class="stat" style="--c:var(--social)"><i></i><span>Social</span><b id="n-social">0</b></div>
-            <div class="stat" style="--c:var(--focus)"><i></i><span>Focus</span><b id="n-focus">0</b></div>
-            <div class="bar" aria-hidden="true"><span id="b-open" style="background:var(--open)"></span><span id="b-social" style="background:var(--social)"></span><span id="b-focus" style="background:var(--focus)"></span></div>
+            <div class="stat" style="--c:#3FB874"><i></i><span>Open</span><b id="n-open">0</b></div>
+            <div class="stat" style="--c:#5B8DEF"><i></i><span>Social</span><b id="n-social">0</b></div>
+            <div class="stat" style="--c:#E5606C"><i></i><span>Focus</span><b id="n-focus">0</b></div>
+            <div class="bar" aria-hidden="true"><span id="b-open" style="background:#3FB874"></span><span id="b-social" style="background:#5B8DEF"></span><span id="b-focus" style="background:#E5606C"></span></div>
           </aside>
           <div class="room" id="room" aria-label="Animated room map showing people by signal color">
             <div class="zone" id="z0"></div><div class="zone" id="z1"></div><div class="zone" id="z2"></div><div class="zone" id="z3"></div>
@@ -424,355 +388,248 @@ footer .fl{display:flex;gap:24px}
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <section id="modes">
+  <section id="wear" style="padding-top:24px">
     <div class="wrap">
-      <div class="head">
-        <span class="kicker"><i></i>The modes</span>
-        <h2>One band. Three signals. <span class="soft">Read in a glance.</span></h2>
-        <p>The light ring does the talking, so you never have to explain whether now's a good time.</p>
+      <h2 class="h2">Same room. <span class="soft">More connection.</span></h2>
+      <div class="grid3">
+        <div class="shot"><img src="w-open.jpg" alt="Wrist wearing SYGNAL in green Open mode"><span class="lab" style="background:#E6F4EC;color:#1E7A47">Open</span><b>Between sets, say hello.</b><p>Meet the regulars you've nodded at for months.</p></div>
+        <div class="shot"><img src="w-social.jpg" alt="Wrist wearing SYGNAL in blue Social mode"><span class="lab" style="background:#E8EFFC;color:#2F5FC4">Social</span><b>Find your spotter.</b><p>Partner up for a lift, a run, or a round.</p></div>
+        <div class="shot"><img src="w-focus.jpg" alt="Wrist wearing SYGNAL in red Focus mode"><span class="lab" style="background:#FBE9EB;color:#B83A47">Focus</span><b>Headphones in. World out.</b><p>Train, study, or recharge in peace.</p></div>
       </div>
-      <div class="modes">
-        <button class="mode" data-mode="open" aria-pressed="true" style="--c:var(--open)">
-          <div class="pic"><img src="m-open.jpg" alt="SYGNAL band glowing green"></div>
-          <div class="txt">
-            <div class="mode-top"><h3>Open</h3><span class="dot"><i></i>Green</span></div>
-            <p>Open to conversation and meeting new people.</p>
-            <div class="tells"><span>Tells others</span><b>Come say hi</b></div>
-          </div>
-        </button>
-        <button class="mode" data-mode="social" aria-pressed="false" style="--c:var(--social)">
-          <div class="pic"><img src="m-social.jpg" alt="SYGNAL band glowing blue"></div>
-          <div class="txt">
-            <div class="mode-top"><h3>Social</h3><span class="dot"><i></i>Blue</span></div>
-            <p>Down for a workout partner, a dance, or a friendly chat.</p>
-            <div class="tells"><span>Tells others</span><b>Friendly, not flirting</b></div>
-          </div>
-        </button>
-        <button class="mode" data-mode="focus" aria-pressed="false" style="--c:var(--focus)">
-          <div class="pic"><img src="m-focus.jpg" alt="SYGNAL band glowing red"></div>
-          <div class="txt">
-            <div class="mode-top"><h3>Focus</h3><span class="dot"><i></i>Red</span></div>
-            <p>Prefer to be left alone right now.</p>
-            <div class="tells"><span>Tells others</span><b>Give me space</b></div>
-          </div>
-        </button>
-      </div>
-      <p class="press hand">Press the button or rotate the band to switch, anytime.</p>
     </div>
   </section>
 
-  <section id="app" style="padding-top:20px">
-    <div class="wrap">
-      <div class="head">
-        <span class="kicker"><i></i>The SYGNAL app</span>
-        <h2>Tap bands. <span class="soft">Both say yes.</span></h2>
-        <p>Hold your bracelets together to swap info through the app. Nothing is shared until each person allows it.</p>
-      </div>
-      <div class="app-grid">
-        <div class="app-demo" id="app-demo">
-          <div class="tap-stage" id="tap-stage">
-            <div class="pill a" data-who="You"></div>
-            <div class="spark"></div>
-            <div class="pill b" data-who="Maya"></div>
-          </div>
-          <div class="phones">
-            <div class="phone" id="phone-you">
-              <div class="phone-top"><b>You</b><span>SYGNAL</span></div>
-              <div class="phone-msg">Hold your band to someone else's to start.</div>
-            </div>
-            <div class="phone" id="phone-maya">
-              <div class="phone-top"><b>Maya</b><span>SYGNAL</span></div>
-              <div class="phone-msg">Hold your band to someone else's to start.</div>
-            </div>
-          </div>
-          <div class="demo-bar">
-            <p id="demo-hint">Try it: tap the bands together.</p>
-            <button class="btn btn-primary" id="tap-btn" type="button">Tap bands together</button>
-          </div>
-        </div>
-        <div class="app-side">
-          <ol class="steps">
-            <li><span class="n">1</span><div><b>Hold your bands together</b><p>A quick tap between two SYGNAL bands starts a connection request in the app.</p></div></li>
-            <li><span class="n">2</span><div><b>Each person allows it</b><p>You both get a prompt. Your info only goes out when you say so, and you never receive anything the other person didn't approve.</p></div></li>
-            <li><span class="n">3</span><div><b>You're connected</b><p>Once both people allow it, your contact details land in each other's app. Decline, and nothing is shared.</p></div></li>
-          </ol>
-          <div class="pulse-card">
-            <div class="pulse-pair" aria-hidden="true"><span></span><span></span></div>
-            <div><h3>When it's mutual, your band pulses.</h3><p>If you're interested in someone and they're interested in you too, both bands pulse your color, so you know the interest is real.</p></div>
-          </div>
+  <section id="finishes" style="padding-top:24px">
+    <div class="wrap fin">
+      <div class="fin-stage" id="fin-stage" role="img" aria-label="SYGNAL band in the selected finish">
+        <span class="fin-label"><i></i><span id="fin-name">Black</span> · <span data-b="label">Open</span> light</span>
+        <div class="b-shadow"></div>
+        <div class="band">
+          <div class="b-back"></div>
+          <div class="b-front"></div>
+          <div class="b-keeper"></div>
+          <div class="b-hole" style="top:140px"></div><div class="b-hole" style="top:166px"></div><div class="b-hole" style="top:192px"></div>
+          <div class="b-glow"></div>
+          <div class="b-cap"><div class="b-screen"><div class="b-read"><div class="b-time" id="fin-time">10:40</div><div class="b-mode" data-b="upper">OPEN</div></div></div></div>
+          <div class="b-btn"></div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section id="everywhere" style="padding-top:20px">
-    <div class="wrap">
-      <div class="head">
-        <span class="kicker"><i></i>Where to wear</span>
-        <h2>Same room. <span class="soft">More connection.</span></h2>
-      </div>
-      <div class="gallery">
-        <div class="shot" style="--c:var(--open)"><img src="w-open.jpg" alt="Wrist wearing SYGNAL in green Open mode"><span class="tag"><i></i>Open</span><div class="cap"><b>Between sets, say hello.</b><span>Meet the regulars you've nodded at for months.</span></div></div>
-        <div class="shot" style="--c:var(--social)"><img src="w-social.jpg" alt="Wrist wearing SYGNAL in blue Social mode"><span class="tag"><i></i>Social</span><div class="cap"><b>Find your spotter.</b><span>Partner up for a lift, a run, or a round.</span></div></div>
-        <div class="shot" style="--c:var(--focus)"><img src="w-focus.jpg" alt="Wrist wearing SYGNAL in red Focus mode"><span class="tag"><i></i>Focus</span><div class="cap"><b>Headphones in. World out.</b><span>Train, study, or recharge in peace.</span></div></div>
-      </div>
-      <div class="scenes">
-        <div class="scene"><b>Gyms</b><p>Workout partners without the awkward interruption.</p></div>
-        <div class="scene"><b>Campus</b><p>Make friends on the quad, focus in the library.</p></div>
-        <div class="scene"><b>Nightlife</b><p>Rooftops and lounges where people know who's open.</p></div>
-        <div class="scene"><b>Singles events</b><p>Mixers where everyone arrives with a signal.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="finishes" style="padding-top:20px">
-    <div class="wrap finish">
-      <div class="finish-photo"><img src="colors.jpg" alt="SYGNAL bands in black, white, blush, and sage"></div>
-      <div class="finish-panel">
-        <span class="kicker"><i></i>Finishes</span>
-        <h3>Your style on the band. Your signal in the light.</h3>
-        <p>Four soft-touch colorways that go from the squat rack to the rooftop.</p>
+      <div class="fin-panel">
+        <h2>Your style on the band. <span class="soft">Your signal in the light.</span></h2>
+        <p>Pick a finish. The LED ring glows in whichever mode you're in.</p>
         <div class="swatches" role="group" aria-label="Band finish">
-          <button class="sw" aria-pressed="true" style="--s:#1B1A1E"><i></i><b>Black</b><small>Classic and bold</small></button>
-          <button class="sw" aria-pressed="false" style="--s:#EDEAE4"><i></i><b>White</b><small>Clean and minimal</small></button>
-          <button class="sw" aria-pressed="false" style="--s:#E2B8AA"><i></i><b>Blush</b><small>Stylish and subtle</small></button>
-          <button class="sw" aria-pressed="false" style="--s:#9DB39C"><i></i><b>Sage</b><small>Modern and fresh</small></button>
+          <button type="button" class="sw" aria-pressed="true" style="--s:#26252A" data-name="Black" data-strap="#26252A" data-back="#18171C" data-bezel="#34333A" data-bg="#ECEAE6" data-note="Black goes with everything."><i></i><span>Black<small>Classic and bold</small></span></button>
+          <button type="button" class="sw" aria-pressed="false" style="--s:#F1EDE7" data-name="White" data-strap="#F1EDE7" data-back="#CFC9C1" data-bezel="#DAD6D0" data-bg="#DEDAD3" data-note="White keeps it clean."><i></i><span>White<small>Clean and minimal</small></span></button>
+          <button type="button" class="sw" aria-pressed="false" style="--s:#E6BFB1" data-name="Blush" data-strap="#E6BFB1" data-back="#C49C8D" data-bezel="#CFA595" data-bg="#F5E7E1" data-note="Blush adds a little warmth."><i></i><span>Blush<small>Stylish and subtle</small></span></button>
+          <button type="button" class="sw" aria-pressed="false" style="--s:#A3BBA3" data-name="Sage" data-strap="#A3BBA3" data-back="#7E987E" data-bezel="#8AA48A" data-bg="#E6EDE4" data-note="Sage feels fresh and easy."><i></i><span>Sage<small>Modern and fresh</small></span></button>
         </div>
-        <p class="finish-note hand" id="finish-note">Black goes with everything.</p>
+        <p class="fin-note t" id="fin-note">Black goes with everything.</p>
       </div>
     </div>
   </section>
 
-  <section id="features" style="padding-top:20px">
+  <section id="pricing" style="padding-top:24px">
     <div class="wrap">
-      <div class="head">
-        <span class="kicker"><i></i>Details</span>
-        <h2>Designed to be worn. <span class="soft">Engineered to be read.</span></h2>
-      </div>
-      <div class="bento">
-        <div class="tile t-a">
-          <h3>Press or rotate</h3>
-          <p>A single side button cycles your signal. No app, no menus, no pulling out your phone.</p>
-          <div class="dial"><div class="knob" id="knob"></div>
-            <ul><li data-l="open" class="on">Open</li><li data-l="social">Social</li><li data-l="focus">Focus</li></ul></div>
-        </div>
-        <div class="tile t-b">
-          <h3>Readable across the room</h3>
-          <p>A soft light ring tuned to be clear in dim bars and bright gyms without being loud.</p>
-          <div class="big">30<small>ft visibility</small></div>
-        </div>
-        <div class="tile t-c">
-          <h3>Hosts see the room</h3>
-          <p>A live signal mix for your venue, so you can time mixers and group classes.</p>
-          <svg class="spark" viewBox="0 0 300 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 58 C 30 55, 45 48, 70 46 S 110 30, 140 34 S 190 14, 220 18 S 270 6, 300 8" fill="none" stroke-width="2.5"/></svg>
-        </div>
-        <div class="tile t-d">
-          <h3>Respect is the rule</h3>
-          <p>Red means no. Partner venues post the code and staff back it up.</p>
-          <div class="mini"><div style="--c:var(--focus)"><i></i>Focus honored<span>Always</span></div><div style="--c:var(--open)"><i></i>Open, not obligated<span>Always</span></div></div>
-        </div>
-        <div class="tile t-e">
-          <h3>A real digital watch</h3>
-          <p>A crisp always-on time display, plus a week of battery for workouts and nights out.</p>
-          <div class="big">7<small>days</small></div>
-        </div>
+      <h2 class="h2">Pick your plan.</h2>
+      <div class="grid3">
+        <div class="plan"><b>Solo</b><span class="price">$89</span><span>One band, every mood.</span><span class="gap"></span><a href="#join" style="border:1px solid var(--ink)">Reserve Solo</a></div>
+        <div class="plan feat t"><b>Crew · Most popular</b><span class="price">$239</span><span>Three bands for roommates, lifting partners, and friend groups.</span><span class="gap"></span><a href="#join" style="background:var(--ink);color:#fff">Reserve Crew</a></div>
+        <div class="plan"><b>Host</b><span class="price">Custom</span><span>Gyms, venues, campus orgs, and event producers.</span><span class="gap"></span><a href="#join" style="border:1px solid var(--ink)">Talk to us</a></div>
       </div>
     </div>
   </section>
 
-  <section id="stories" style="padding-top:20px">
+  <section id="faq" style="padding-top:24px">
     <div class="wrap">
-      <div class="head"><span class="kicker"><i></i>From the pilot</span><h2>People are already <span class="soft">talking.</span></h2></div>
-      <div class="quotes">
-        <div class="quote big-q" style="--c:var(--open)"><q>I wore green for one night and had more real conversations than a month of swiping.</q><div class="who"><span class="av"></span><span>Jordan, 24<small>Pilot member</small></span></div></div>
-        <div class="quote" style="--c:var(--social)"><q>Found a lifting partner in my first week. I'd been too nervous to ask anyone for a year.</q><div class="who"><span class="av"></span><span>Alexis, 29<small>Gym member</small></span></div></div>
-        <div class="quote" style="--c:var(--focus)"><q>Finals week, red on. Nobody interrupted me once. That alone is worth it.</q><div class="who"><span class="av"></span><span>Priya, 20<small>University student</small></span></div></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="pricing" style="padding-top:20px">
-    <div class="wrap">
-      <div class="head"><span class="kicker"><i></i>Pricing</span><h2>Pick your plan.</h2><p>Every band includes all three modes. Hosts can outfit a whole room.</p></div>
-      <div class="plans">
-        <div class="plan"><h3>Solo</h3><div class="price">$89</div><p class="muted">One band, every mood.</p>
-          <ul><li>SYGNAL band in your finish</li><li>Magnetic charger</li><li>SYGNAL nights waitlist</li></ul>
-          <a class="btn btn-ghost" href="#join">Reserve Solo</a></div>
-        <div class="plan featured"><span class="badge">Most popular</span><h3>Crew</h3><div class="price">$239 <small>/ 3 bands</small></div><p class="muted">For roommates, lifting partners, and friend groups.</p>
-          <ul><li>Three bands, mix any finishes</li><li>Founding member pricing</li><li>Priority access to SYGNAL nights</li><li>Limited founders edition box</li></ul>
-          <a class="btn btn-primary" href="#join">Reserve Crew</a></div>
-        <div class="plan"><h3>Host</h3><div class="price">Custom</div><p class="muted">Gyms, venues, campus orgs, and event producers.</p>
-          <ul><li>Bulk bands from 50 members</li><li>Live room dashboard</li><li>Co-branded signage kit</li><li>Launch support</li></ul>
-          <a class="btn btn-ghost" href="#join">Talk to us</a></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="faq" style="padding-top:20px">
-    <div class="wrap">
-      <div class="head"><h2>Questions, answered.</h2></div>
+      <h2 class="h2">Questions, answered.</h2>
       <div class="faq">
-        <details open><summary>Is SYGNAL a watch?</summary><p>Yes. The face is a digital watch display that shows the time, while the light ring around it shows your mode.</p></details>
+        <details open><summary>Is SYGNAL a watch?</summary><p>Yes. The screen shows the time, and the light ring around it shows your mode.</p></details>
         <details><summary>How do I change modes?</summary><p>Press the side button or rotate the band. The light ring switches between green, blue, and red instantly.</p></details>
         <details><summary>Does green mean I have to talk to anyone who approaches?</summary><p>Never. Open means you're up for meeting people, not that you owe anyone your time. Switch to red whenever you like.</p></details>
-        <details><summary>Do I need an app?</summary><p>The band shows your signal on its own. The SYGNAL app is how you swap info: tap bands together, and your details only go through once each person allows it.</p></details>
-        <details><summary>Can someone get my info without my permission?</summary><p>No. Tapping bands only sends a request. Your details are shared only after you allow it in the app, and you can always decline.</p></details>
-        <details><summary>Can my gym or venue run SYGNAL nights?</summary><p>Yes. Choose the Host plan and we'll help you set up bands, signage, and the room dashboard.</p></details>
+        <details><summary>How does sharing info work?</summary><p>Tap bands together to send a request in the SYGNAL app. Your details are shared only after both people allow it, and you can always decline.</p></details>
+        <details><summary>Can my gym or venue run SYGNAL nights?</summary><p>Yes. Choose the Host plan and we'll help you set up bands, signage, and the live room view.</p></details>
       </div>
     </div>
   </section>
 
-  <div class="wrap" id="join">
+  <div class="wrap" id="join" style="padding-bottom:48px">
     <div class="cta">
-      <div class="wm" aria-hidden="true">SYGNAL</div>
-      <h2>Wear your intention.</h2>
-      <p class="hand">Same room. More connection.</p>
-      <p>Join the waitlist for founding pricing and first access to SYGNAL nights in your city.</p>
-      <form id="wait" novalidate>
-        <label for="email" style="position:absolute;left:-9999px">Email address</label>
-        <input id="email" type="email" placeholder="you@email.com" autocomplete="email">
-        <button class="btn btn-primary" type="submit">Get early access</button>
-      </form>
-      <p class="msg" id="msg" aria-live="polite"></p>
+      <div class="fx streak1"></div><div class="fx streak2"></div><div class="fx streak3"></div>
+      <div class="fx ring1"></div><div class="fx ring2"></div>
+      <div class="fx refl"></div><div class="fx refl-ring"></div>
+      <div class="fx spk" style="left:18%;top:22%;width:6px;height:6px;box-shadow:0 0 12px 3px #fff"></div>
+      <div class="fx spk" style="left:76%;top:70%;width:5px;height:5px;box-shadow:0 0 10px 3px #fff"></div>
+      <div class="fx spk" style="left:66%;top:16%;width:4px;height:4px;box-shadow:0 0 8px 2px #fff"></div>
+      <div class="fx spk" style="left:28%;top:74%;width:4px;height:4px;box-shadow:0 0 8px 2px #fff"></div>
+      <div class="cta-in">
+        <p class="kick">PEOPLE. FITNESS. CONNECTION.</p>
+        <h2>Wear your intention.</h2>
+        <p class="cp">Join the waitlist for founding pricing and first access to SYGNAL nights in your city.</p>
+        <form class="join" id="wait" novalidate>
+          <label class="sr" for="email">Email address</label>
+          <input id="email" type="email" placeholder="you@email.com" autocomplete="email">
+          <button type="submit">Get early access</button>
+        </form>
+        <p class="msg" id="msg" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 
   <div class="wrap">
     <footer>
-      <span class="wm" style="font-size:13px">SYGNAL</span>
-      <span>© 2026 SYGNAL. Simple signals. Real connections.</span>
-      <div class="fl"><a href="#modes">Modes</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#join">Instagram</a></div>
+      <span class="logo" style="font-size:13px;color:var(--ink)">SYGNAL</span>
+      <span>© 2026 SYGNAL. Say nothing. SYGNAL everything.</span>
     </footer>
   </div>
 </main>
 
 <script>
 (function(){
-  const root = document.documentElement;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const modes = ['open','social','focus'];
-  const info = { open:['Open','Open to conversation'], social:['Social','Down for a friendly chat'], focus:['Focus','Prefer to be left alone'] };
-  let mode = 'open', touched = false;
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var M = {
+    open:  {label:'Open',  tells:'Come say hi',            desc:'Open to conversation',     c:'#3FB874', tint:'#E6F4EC', text:'#1E7A47', glow:'rgba(63,184,116,.45)'},
+    social:{label:'Social',tells:'Friendly, not flirting', desc:'Down for a friendly chat', c:'#5B8DEF', tint:'#E8EFFC', text:'#2F5FC4', glow:'rgba(91,141,239,.45)'},
+    focus: {label:'Focus', tells:'Give me space',          desc:'Prefer to be left alone',  c:'#E5606C', tint:'#FBE9EB', text:'#B83A47', glow:'rgba(229,96,108,.42)'}
+  };
+  var order = ['open','social','focus'], mode = 'open', touched = false;
 
   function setMode(m){
-    mode = m;
-    root.style.setProperty('--active','var(--'+m+')');
-    document.getElementById('chip-name').textContent = info[m][0];
-    document.getElementById('chip-text').textContent = info[m][1];
-    document.querySelectorAll('.mode').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
-    document.querySelectorAll('.dial li').forEach(l => l.classList.toggle('on', l.dataset.l === m));
-    document.getElementById('knob').style.setProperty('--rot', (-modes.indexOf(m)*120) + 'deg');
+    mode = m; var d = M[m];
+    root.style.setProperty('--accent', d.c); root.style.setProperty('--tint', d.tint);
+    root.style.setProperty('--text', d.text); root.style.setProperty('--glow', d.glow);
+    document.querySelectorAll('[data-b="label"]').forEach(function(e){ e.textContent = d.label; });
+    document.querySelectorAll('[data-b="tells"]').forEach(function(e){ e.textContent = d.tells; });
+    document.querySelectorAll('[data-b="desc"]').forEach(function(e){ e.textContent = d.desc; });
+    document.querySelectorAll('[data-b="upper"]').forEach(function(e){ e.textContent = d.label.toUpperCase(); });
+    document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.mode === m); });
   }
-  document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => { touched = true; setMode(b.dataset.mode); }));
-  document.getElementById('knob').addEventListener('click', () => { touched = true; setMode(modes[(modes.indexOf(mode)+1)%3]); });
-  if (!reduce) setInterval(() => { if (!touched) setMode(modes[(modes.indexOf(mode)+1)%3]); }, 3400);
+  document.querySelectorAll('.seg button').forEach(function(b){
+    b.addEventListener('click', function(){ touched = true; setMode(b.dataset.mode); });
+  });
+  if (!reduce) setInterval(function(){ if (!touched) setMode(order[(order.indexOf(mode)+1)%3]); }, 3400);
+
+  // Live time on the finish band
+  function tick(){ var d = new Date(); document.getElementById('fin-time').textContent = (d.getHours()%12||12) + ':' + String(d.getMinutes()).padStart(2,'0'); }
+  tick(); setInterval(tick, 15000);
 
   // Finishes
-  const notes = { Black:'Black goes with everything.', White:'White keeps it clean.', Blush:'Blush adds a little warmth.', Sage:'Sage feels fresh and easy.' };
-  document.querySelectorAll('.sw').forEach(s => s.addEventListener('click', () => {
-    document.querySelectorAll('.sw').forEach(x => x.setAttribute('aria-pressed', x === s));
-    document.getElementById('finish-note').textContent = notes[s.querySelector('b').textContent];
-  }));
-
-  // App: tap to connect demo
-  const demo = document.getElementById('app-demo');
-  const tapBtn = document.getElementById('tap-btn');
-  const hint = document.getElementById('demo-hint');
-  const people = { you:{other:'Maya', handle:'@maya.lifts', c:'var(--social)'}, maya:{other:'you', handle:'@you', c:'var(--open)'} };
-  let allowed = {}, step = 'idle';
-  function msg(id, html){ document.querySelector('#phone-'+id).innerHTML = '<div class="phone-top"><b>'+(id==='you'?'You':'Maya')+'</b><span>SYGNAL</span></div>' + html; }
-  function idle(){
-    step='idle'; allowed={}; demo.classList.remove('tapped');
-    ['you','maya'].forEach(id=>msg(id,'<div class="phone-msg">Hold your band to someone else\'s to start.</div>'));
-    hint.textContent='Try it: tap the bands together.'; tapBtn.textContent='Tap bands together';
-  }
-  function ask(id){
-    const p=people[id];
-    msg(id,'<div class="phone-msg">Share your contact with <strong>'+p.other+'</strong>?</div>'+
-      '<div class="phone-actions"><button class="allow" data-id="'+id+'" data-a="allow">Allow</button><button data-id="'+id+'" data-a="no">Not now</button></div>');
-  }
-  function waiting(id){ msg(id,'<div class="phone-msg">You allowed it. Waiting for '+(id==='you'?'Maya':'you')+' to allow too.</div><span class="status" style="--c:var(--social)"><i></i>Pending</span>'); }
-  function connected(){
-    step='done';
-    ['you','maya'].forEach(id=>{ const p=people[id];
-      msg(id,'<span class="status" style="--c:var(--open)"><i></i>Connected</span><div class="contact"><span class="av" style="--c:'+p.c+'"></span><span>'+(id==='you'?'Maya':'You')+'<small>'+p.handle+'</small></span></div>'); });
-    hint.textContent='Both allowed it, so info went through.'; tapBtn.textContent='Reset';
-  }
-  function declined(id){
-    step='done';
-    msg(id,'<div class="phone-msg">You declined. Nothing was shared.</div><span class="status" style="--c:var(--focus)"><i></i>Declined</span>');
-    msg(id==='you'?'maya':'you','<div class="phone-msg">No connection this time. Your info stayed private too.</div>');
-    hint.textContent='One person said no, so nothing was shared either way.'; tapBtn.textContent='Reset';
-  }
-  function setGap(){ const st=document.getElementById('tap-stage').getBoundingClientRect(); const pill=demo.querySelector('.pill.a').getBoundingClientRect();
-    demo.style.setProperty('--gap', Math.max(0,(st.left+st.width/2)-pill.right) + 'px'); }
-  tapBtn.addEventListener('click',()=>{
-    if(step!=='idle'){ idle(); return; }
-    setGap(); demo.classList.add('tapped'); step='asking';
-    hint.textContent='Request sent. Each person decides for themselves.'; tapBtn.textContent='Reset';
-    setTimeout(()=>{ if(step==='asking'){ ask('you'); ask('maya'); } }, 900);
+  var fin = document.getElementById('fin-stage');
+  document.querySelectorAll('.sw').forEach(function(s){
+    s.addEventListener('click', function(){
+      document.querySelectorAll('.sw').forEach(function(x){ x.setAttribute('aria-pressed', x === s); });
+      fin.style.setProperty('--strap', s.dataset.strap); fin.style.setProperty('--back', s.dataset.back);
+      fin.style.setProperty('--bezel', s.dataset.bezel); fin.style.setProperty('--fbg', s.dataset.bg);
+      document.getElementById('fin-name').textContent = s.dataset.name;
+      document.getElementById('fin-note').textContent = s.dataset.note;
+    });
   });
-  demo.addEventListener('click',e=>{
-    const b=e.target.closest('[data-a]'); if(!b||step!=='asking') return;
-    if(b.dataset.a==='no') return declined(b.dataset.id);
-    allowed[b.dataset.id]=true;
-    if(allowed.you && allowed.maya) connected(); else waiting(b.dataset.id);
-  });
-  addEventListener('resize',()=>{ if(demo.classList.contains('tapped')) setGap(); });
 
-  // Live room
-  const venues = {
+  // Tap-to-share demo
+  var stage = document.getElementById('tapstage'), bubble = document.getElementById('bubble');
+  var tapBtn = document.getElementById('tap'), hint = document.getElementById('hint');
+  var S = {step:'idle', you:false, maya:false, no:null}, timer;
+  var top = function(n){ return '<div class="phone-top"><b>'+n+'</b><span>SYGNAL</span></div>'; };
+  function phone(id){
+    var me = id === 'you', other = me ? 'Maya' : 'you', name = me ? 'You' : 'Maya';
+    var allowed = me ? S.you : S.maya, asking = S.step === 'asking';
+    if (S.step === 'idle' || S.step === 'tapping')
+      return top(name) + '<p>' + (S.step === 'tapping' ? 'Bands touched…' : 'Hold your band to someone else’s to start.') + '</p>';
+    if (asking && !allowed)
+      return top(name) + '<p class="grow">Share your contact with <b>'+other+'</b>?</p><div class="acts"><button type="button" class="allow" data-a="allow" data-id="'+id+'">Allow</button><button type="button" data-a="no" data-id="'+id+'">Not now</button></div>';
+    if (asking && allowed)
+      return top(name) + '<p class="grow">You allowed it. Waiting for '+(me ? 'Maya' : 'the other person')+' to allow too.</p><span class="tag" style="background:#E8EFFC;color:#2F5FC4">Pending</span>';
+    if (S.no === id)
+      return top(name) + '<p class="grow">You declined. Nothing was shared.</p><span class="tag" style="background:#FBE9EB;color:#B83A47">Declined</span>';
+    if (S.no)
+      return top(name) + '<p>No connection this time. Your info stayed private too.</p>';
+    return top(name) + '<span class="tag" style="background:#E6F4EC;color:#1E7A47">Connected</span><div class="contact"><i style="background:'+(me ? '#5B8DEF' : '#3FB874')+'"></i><span>'+(me ? 'Maya' : 'You')+'<small>'+(me ? '@maya.lifts' : '@you')+'</small></span></div>';
+  }
+  function render(){
+    var asking = S.step === 'asking', done = S.step === 'done';
+    stage.classList.toggle('tapped', S.step !== 'idle');
+    stage.classList.toggle('asking', asking);
+    stage.classList.toggle('declined', !!S.no);
+    document.getElementById('ph-you').innerHTML = phone('you');
+    document.getElementById('ph-maya').innerHTML = phone('maya');
+    bubble.classList.toggle('show', asking || done);
+    bubble.querySelector('span').textContent = asking ? 'Share contact?' : (S.no ? 'Nothing shared' : 'Contact shared');
+    bubble.style.setProperty('--b', asking ? '#C8C8CE' : (S.no ? '#E5606C' : '#3FB874'));
+    hint.textContent = S.step === 'idle' ? 'Try it: tap the bands together.'
+      : S.step === 'tapping' ? 'Bands touched. Sending a request…'
+      : asking ? 'Both bands pulse white while each person decides.'
+      : S.no ? 'One person said no, so nothing was shared either way.'
+      : 'Both allowed it, so the info went through.';
+    tapBtn.textContent = S.step === 'idle' ? 'Tap bands together' : 'Reset';
+  }
+  tapBtn.addEventListener('click', function(){
+    clearTimeout(timer);
+    if (S.step !== 'idle'){ S = {step:'idle', you:false, maya:false, no:null}; return render(); }
+    S.step = 'tapping'; render();
+    timer = setTimeout(function(){ S.step = 'asking'; render(); }, 1000);
+  });
+  document.querySelector('.phones').addEventListener('click', function(e){
+    var b = e.target.closest('[data-a]'); if (!b || S.step !== 'asking') return;
+    if (b.dataset.a === 'no'){ S.no = b.dataset.id; S.step = 'done'; return render(); }
+    S[b.dataset.id] = true;
+    if (S.you && S.maya) S.step = 'done';
+    render();
+  });
+  render();
+
+  // Host room map
+  var venues = {
     rooftop:{name:'Rooftop Social',time:'Friday, 10:40 pm',zones:['Bar','Dance floor','Lounge','Terrace'],mix:[.46,.36],toast:'12 new Open signals'},
     gym:{name:'Iron District Gym',time:'Tuesday, 6:15 pm',zones:['Free weights','Cardio','Stretch area','Racks'],mix:[.24,.38],toast:'5 people looking for a partner'},
     campus:{name:'Student Union',time:'Wednesday, 1:20 pm',zones:['Cafe','Commons','Study hall','Patio'],mix:[.3,.3],toast:'18 students heads-down in Focus'}
   };
+  var C = {open:'#3FB874', social:'#5B8DEF', focus:'#E5606C'};
   // Zones end at 76% of the map height so the bottom strip stays clear for the notification
-  const boxes = [[5,6,34,32],[48,6,46,26],[5,44,30,32],[52,40,42,36]];
-  const room = document.getElementById('room');
-  let seed = 11; const rnd = () => (seed = (seed*9301+49297)%233280)/233280;
-  let venue = venues.rooftop;
-  const guests = [];
-  for (let i=0;i<46;i++){ const el=document.createElement('span'); el.className='guest'; room.appendChild(el); guests.push({el,type:'open'}); }
-
-  function pickType(){ const r=rnd(); return r<venue.mix[0]?'open':r<venue.mix[0]+venue.mix[1]?'social':'focus'; }
+  var boxes = [[5,6,34,32],[48,6,46,26],[5,44,30,32],[52,40,42,36]];
+  var room = document.getElementById('room');
+  var seed = 11, rnd = function(){ return (seed = (seed*9301+49297)%233280)/233280; };
+  var venue = venues.rooftop, guests = [];
+  for (var i=0;i<46;i++){ var el=document.createElement('span'); el.className='guest'; room.appendChild(el); guests.push({el:el,type:'open'}); }
+  function pickType(){ var r=rnd(); return r<venue.mix[0]?'open':r<venue.mix[0]+venue.mix[1]?'social':'focus'; }
   function place(g){
-    let zi = Math.floor(rnd()*4);
-    if (g.type==='focus' && rnd()<.6) zi = 2;
-    const b = boxes[zi];
+    var zi = Math.floor(rnd()*4); if (g.type==='focus' && rnd()<.6) zi = 2;
+    var b = boxes[zi];
     g.el.style.left = (b[0]+3 + rnd()*(b[2]-6)) + '%';
-    g.el.style.top  = (b[1]+8 + rnd()*(b[3]-12)) + '%';
-    g.el.style.setProperty('--c','var(--'+g.type+')');
+    g.el.style.top = (b[1]+8 + rnd()*(b[3]-12)) + '%';
+    g.el.style.setProperty('--c', C[g.type]);
     g.el.classList.toggle('ping', g.type==='open' && rnd()<.25);
   }
   function tally(){
-    const c={open:0,social:0,focus:0}; guests.forEach(g=>c[g.type]++);
-    modes.forEach(m=>{ document.getElementById('n-'+m).textContent=c[m]; document.getElementById('b-'+m).style.width=(c[m]/guests.length*100)+'%'; });
+    var c={open:0,social:0,focus:0}; guests.forEach(function(g){ c[g.type]++; });
+    order.forEach(function(m){ document.getElementById('n-'+m).textContent=c[m]; document.getElementById('b-'+m).style.width=(c[m]/guests.length*100)+'%'; });
   }
   function setVenue(key){
     venue = venues[key];
     document.getElementById('v-name').textContent = venue.name;
     document.getElementById('v-time').textContent = venue.time;
     document.getElementById('toast-b').textContent = venue.toast;
-    boxes.forEach((b,i)=>{ const z=document.getElementById('z'+i); z.textContent=venue.zones[i]; Object.assign(z.style,{left:b[0]+'%',top:b[1]+'%',width:b[2]+'%',height:b[3]+'%'}); });
-    document.querySelectorAll('[data-venue]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.venue===key));
-    guests.forEach(g=>{ g.type=pickType(); place(g); }); tally();
+    boxes.forEach(function(b,i){ var z=document.getElementById('z'+i); z.textContent=venue.zones[i]; z.style.left=b[0]+'%'; z.style.top=b[1]+'%'; z.style.width=b[2]+'%'; z.style.height=b[3]+'%'; });
+    document.querySelectorAll('[data-venue]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.venue===key); });
+    guests.forEach(function(g){ g.type=pickType(); place(g); }); tally();
   }
-  document.querySelectorAll('[data-venue]').forEach(b=>b.addEventListener('click',()=>setVenue(b.dataset.venue)));
+  document.querySelectorAll('[data-venue]').forEach(function(b){ b.addEventListener('click', function(){ setVenue(b.dataset.venue); }); });
   setVenue('rooftop');
-  if (!reduce) setInterval(()=>{
-    for (let k=0;k<6;k++){ const g=guests[Math.floor(rnd()*guests.length)]; if (rnd()<.35) g.type=pickType(); place(g); }
+  if (!reduce) setInterval(function(){
+    for (var k=0;k<6;k++){ var g=guests[Math.floor(rnd()*guests.length)]; if (rnd()<.35) g.type=pickType(); place(g); }
     tally();
-  },2200);
+  }, 2200);
 
-  document.getElementById('wait').addEventListener('submit', e=>{
+  // Waitlist
+  document.getElementById('wait').addEventListener('submit', function(e){
     e.preventDefault();
-    const v=document.getElementById('email').value.trim();
+    var v = document.getElementById('email').value.trim();
     document.getElementById('msg').textContent = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
       ? "You're on the list. We'll email you before the founding drop."
       : 'Enter a full email address, like you@email.com.';
   });
+
   setMode('open');
 })();
 </script>
