@@ -62,8 +62,10 @@ h1{margin:22px auto 0;max-width:980px;font-weight:800;font-size:clamp(52px,7.6vw
 .stage .s-ring1{left:50%;top:50%;width:92%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:3px solid rgba(255,255,255,.95);box-shadow:0 0 28px 4px rgba(255,255,255,.85),inset 0 0 28px 4px rgba(255,255,255,.6)}
 .stage .s-ring2{left:50%;top:50%;width:112%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(255,255,255,.45)}
 .stage .halo{position:absolute;left:50%;top:50%;width:560px;height:560px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,var(--glow),transparent)}
-.photo{position:relative;width:min(520px,100%);aspect-ratio:372/450;border-radius:28px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,.35)}
-.photo img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.photo{position:relative;width:min(520px,100%);aspect-ratio:372/450;overflow:hidden}
+/* Brighten the gray studio backdrop to white, then multiply so it takes on the sky gradient behind it */
+.photo img{width:100%;height:100%;object-fit:cover;object-position:center 30%;filter:brightness(1.16) contrast(1.06);mix-blend-mode:multiply;
+  -webkit-mask-image:linear-gradient(180deg,#000 0,#000 86%,transparent 100%);mask-image:linear-gradient(180deg,#000 0,#000 86%,transparent 100%)}
 .strip{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .strip path{fill:none;stroke:var(--accent);stroke-linecap:round;transition:stroke .8s}
 .strip-tint{mix-blend-mode:color}.strip-tint path{stroke-width:3.2}
