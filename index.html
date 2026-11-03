@@ -56,7 +56,11 @@ h1{margin:22px auto 0;max-width:980px;font-weight:800;font-size:clamp(52px,7.6vw
 .seg button i{width:8px;height:8px;border-radius:50%;background:var(--c)}
 .seg button[aria-pressed="true"]{background:var(--c);font-weight:700;box-shadow:0 6px 18px var(--g)}
 .seg button[aria-pressed="true"] i{display:none}
-.stage{position:relative;margin-top:24px;border-radius:40px;background:var(--tint);overflow:hidden;padding:48px 32px;display:flex;justify-content:center}
+.stage{position:relative;margin-top:24px;border-radius:40px;overflow:hidden;padding:48px 32px;display:flex;justify-content:center;
+  background:radial-gradient(45% 55% at 82% 12%,rgba(255,244,226,.95),rgba(255,244,226,0) 70%),radial-gradient(50% 60% at 10% 85%,rgba(255,214,196,.8),rgba(255,214,196,0) 70%),linear-gradient(165deg,#B9CFF3 0%,#D7E3F8 32%,#F3E6E4 62%,#F9D2BC 100%)}
+.stage .fx{position:absolute;pointer-events:none}
+.stage .s-ring1{left:50%;top:50%;width:92%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:3px solid rgba(255,255,255,.95);box-shadow:0 0 28px 4px rgba(255,255,255,.85),inset 0 0 28px 4px rgba(255,255,255,.6)}
+.stage .s-ring2{left:50%;top:50%;width:112%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(255,255,255,.45)}
 .stage .halo{position:absolute;left:50%;top:50%;width:560px;height:560px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,var(--glow),transparent)}
 .photo{position:relative;width:min(520px,100%);aspect-ratio:372/450;border-radius:28px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,.35)}
 .photo img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
@@ -306,6 +310,13 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;paddin
     </div>
     </div>
     <div class="stage t">
+      <div class="fx streak1"></div><div class="fx streak2"></div><div class="fx streak3"></div>
+      <div class="fx s-ring2"></div><div class="fx s-ring1"></div>
+      <div class="fx refl"></div>
+      <div class="fx spk" style="left:12%;top:16%;width:6px;height:6px;box-shadow:0 0 12px 3px #fff"></div>
+      <div class="fx spk" style="left:86%;top:62%;width:5px;height:5px;box-shadow:0 0 10px 3px #fff"></div>
+      <div class="fx spk" style="left:80%;top:10%;width:4px;height:4px;box-shadow:0 0 8px 2px #fff"></div>
+      <div class="fx spk" style="left:8%;top:72%;width:4px;height:4px;box-shadow:0 0 8px 2px #fff"></div>
       <div class="halo"></div>
       <div class="photo">
         <img src="hero.jpg" alt="Black SYGNAL band with a digital time display and glowing light strip">
