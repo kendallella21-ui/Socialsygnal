@@ -39,7 +39,13 @@ h1,h2,h3,.disp{font-family:var(--display);letter-spacing:-.04em}
 .pill-btn.line{border:1px solid var(--ink);background:#fff;color:var(--ink)}
 
 /* Hero */
-.hero{text-align:center;padding:80px 0 32px}
+.hero{padding:64px 0 32px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:56px;align-items:center}
+.hero-copy{text-align:left}
+.hero-copy h1{margin:22px 0 0;font-size:clamp(48px,5.8vw,88px);line-height:1.02}
+.hero-copy .lede{margin:24px 0 0;max-width:500px}
+.hero-copy .seg{justify-content:flex-start}
+.hero-grid .stage{margin-top:0}
 .badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:var(--tint);color:var(--text);font-weight:600;font-size:14px}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;flex:none}
 h1{margin:22px auto 0;max-width:980px;font-weight:800;font-size:clamp(52px,7.6vw,108px);line-height:.95;letter-spacing:-.045em}
@@ -252,6 +258,11 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;paddin
   .side .venue,.side h4,.side .bar{grid-column:1/-1}
   .room{min-height:400px}
   .ticker{border-radius:24px}
+  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .hero-copy{text-align:center}
+  .hero-copy h1{margin-inline:auto}
+  .hero-copy .lede{margin-inline:auto}
+  .hero-copy .seg{justify-content:center}
 }
 @media (max-width:600px){
   .wrap{width:calc(100% - 32px)}
@@ -283,6 +294,8 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;paddin
 
 <main id="top">
   <div class="wrap hero">
+   <div class="hero-grid">
+    <div class="hero-copy">
     <p class="badge t"><span class="dot t"></span><span data-b="label">Open</span> · <span data-b="tells">Come say hi</span></p>
     <h1><span class="soft">Say nothing.</span> <span class="hl t">SYGNAL</span> everything.</h1>
     <p class="lede">A minimal digital watch with a light ring that glows green, blue, or red, so the room knows whether you want to meet someone, be social, or be left alone.</p>
@@ -290,6 +303,7 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;paddin
       <button type="button" data-mode="open" aria-pressed="true" style="--c:#3FB874;--g:rgba(63,184,116,.45)"><i></i>Open</button>
       <button type="button" data-mode="social" aria-pressed="false" style="--c:#5B8DEF;--g:rgba(91,141,239,.45)"><i></i>Social</button>
       <button type="button" data-mode="focus" aria-pressed="false" style="--c:#E5606C;--g:rgba(229,96,108,.42)"><i></i>Focus</button>
+    </div>
     </div>
     <div class="stage t">
       <div class="halo"></div>
@@ -300,6 +314,7 @@ footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;paddin
       </div>
       <div class="chip" aria-live="polite"><span class="dot"></span><span><b data-b="label">Open</b> <span>· <span data-b="desc">Open to conversation</span></span></span></div>
     </div>
+   </div>
     <div class="ticker">
       <span style="color:#1E7A47">Green = come say hi</span><span style="color:#C6C6CC" aria-hidden="true">/</span>
       <span style="color:#2F5FC4">Blue = friendly, not flirting</span><span style="color:#C6C6CC" aria-hidden="true">/</span>
